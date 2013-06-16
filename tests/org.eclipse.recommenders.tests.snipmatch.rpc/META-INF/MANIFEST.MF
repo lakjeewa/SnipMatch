@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Rpc
+Bundle-SymbolicName: org.eclipse.recommenders.tests.snipmatch.rpc
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.eclipse.recommenders.test.snipmatch.rpc.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.recommenders.snipmatch.rpc;bundle-version="1.0.0",
+ org.junit4;bundle-version="4.8.1"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
