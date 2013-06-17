@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SnipMatch Tests
+Bundle-SymbolicName: org.eclipse.recommenders.tests.snipmatch.rcp
+Bundle-Version: 1.0.4.qualifier
+Fragment-Host: org.eclipse.recommenders.snipmatch.rcp
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.junit4;bundle-version="4.8.1"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
