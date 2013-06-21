@@ -1,4 +1,4 @@
-package org.eclipse.recommenders.snipmatch.rpc;
+package org.eclipse.recommenders.snipmatch.rcp;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -9,7 +9,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.recommenders.snipmatch.rpc"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "org.eclipse.recommenders.snipmatch.rcp"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;

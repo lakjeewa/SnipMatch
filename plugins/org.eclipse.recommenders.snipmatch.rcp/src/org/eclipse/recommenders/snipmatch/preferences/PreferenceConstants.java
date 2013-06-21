@@ -1,4 +1,4 @@
-package org.eclipse.recommenders.snipmatch.rpc.preferences;
+package org.eclipse.recommenders.snipmatch.preferences;
 
 /**
  * Constant definitions for plug-in preferences

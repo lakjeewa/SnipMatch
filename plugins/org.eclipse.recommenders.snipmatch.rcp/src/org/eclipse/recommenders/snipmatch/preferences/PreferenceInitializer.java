@@ -1,9 +1,9 @@
-package org.eclipse.recommenders.snipmatch.rpc.preferences;
+package org.eclipse.recommenders.snipmatch.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import org.eclipse.recommenders.snipmatch.rpc.Activator;
+import org.eclipse.recommenders.snipmatch.rcp.Activator;
 
 /**
  * Class used to initialize default preference values.
