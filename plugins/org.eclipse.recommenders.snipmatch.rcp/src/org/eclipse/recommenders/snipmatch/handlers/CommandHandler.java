@@ -3,9 +3,8 @@ package org.eclipse.recommenders.snipmatch.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.recommenders.snipmatch.rcp.Activator;
+import org.eclipse.recommenders.snipmatch.rcp.UserEnvironment;
 
 /**
  * Our sample handler extends AbstractHandler, an IHandler base class.
@@ -25,10 +24,12 @@ public class CommandHandler extends AbstractHandler {
 	 * from the application context.
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		IWorkbenchWindow window = HandlerUtil
-				.getActiveWorkbenchWindowChecked(event);
-		MessageDialog.openInformation(window.getShell(), "Rpc",
-				"Hello, Eclipse world");
+
+		UserEnvironment env = new UserEnvironment();
+
+		if (env.isJavaEditor())
+			Activator.getDefault().showSearchBox();
+
 		return null;
 	}
 }
