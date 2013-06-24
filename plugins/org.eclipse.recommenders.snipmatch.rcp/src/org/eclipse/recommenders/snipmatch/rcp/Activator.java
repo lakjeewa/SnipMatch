@@ -1,5 +1,6 @@
 package org.eclipse.recommenders.snipmatch.rcp;
 
+import org.eclipse.recommenders.snipmatch.search.SearchBox;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -14,6 +15,8 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 	
+	private static SearchBox searchBox;
+	
 	/**
 	 * The constructor
 	 */
@@ -27,6 +30,8 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		
+		searchBox = new SearchBox();
 	}
 
 	/*
@@ -46,5 +51,9 @@ public class Activator extends AbstractUIPlugin {
 	public static Activator getDefault() {
 		return plugin;
 	}
+	
+    public void showSearchBox() {
+        searchBox.show();
+    }
 
 }
