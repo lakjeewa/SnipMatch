@@ -1,9 +1,9 @@
 package org.eclipse.recommenders.snipmatch.preferences;
 
-import org.eclipse.jface.preference.*;
-import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.IWorkbench;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.recommenders.snipmatch.rcp.Activator;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferencePage;
 
 /**
  * This class represents a preference page that is contributed to the
@@ -16,8 +16,7 @@ import org.eclipse.recommenders.snipmatch.rcp.Activator;
  * preferences can be accessed directly via the preference store.
  */
 
-public class SnipMatchPreferencePage extends FieldEditorPreferencePage
-		implements IWorkbenchPreferencePage {
+public class SnipMatchPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
 	public SnipMatchPreferencePage() {
 		super(GRID);
