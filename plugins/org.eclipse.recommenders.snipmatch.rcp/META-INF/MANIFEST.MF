@@ -5,7 +5,13 @@ Bundle-SymbolicName: org.eclipse.recommenders.snipmatch.rcp;singleton:=true
 Bundle-Version: 1.0.4.qualifier
 Bundle-Activator: org.eclipse.recommenders.snipmatch.rcp.Activator
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.jdt.ui;bundle-version="3.8.2",
+ org.eclipse.jdt.core;bundle-version="3.8.3",
+ org.eclipse.core.resources;bundle-version="3.8.1",
+ org.eclipse.jface.text;bundle-version="3.8.2",
+ org.eclipse.recommenders.utils;bundle-version="1.0.3",
+ org.eclipse.ui.editors;bundle-version="3.8.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.eclipse.recommenders.snipmatch.handlers,
