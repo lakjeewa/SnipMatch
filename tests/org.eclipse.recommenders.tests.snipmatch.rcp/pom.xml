@@ -1,13 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.eclipse.recommenders</groupId>
-        <artifactId>tests</artifactId>
-        <version>1.0.4-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
-    <artifactId>org.eclipse.recommenders.tests.snipmatch.rcp</artifactId>
-    <packaging>eclipse-test-plugin</packaging>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.eclipse.recommenders</groupId>
+		<artifactId>tests</artifactId>
+		<version>1.0.4-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+	<artifactId>org.eclipse.recommenders.tests.snipmatch.rcp</artifactId>
+	<packaging>eclipse-test-plugin</packaging>
+	<properties>
+		<tycho-test-jvmArgs></tycho-test-jvmArgs>
+	</properties>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-surefire-plugin</artifactId>
+				<configuration>
+					<useUIHarness>true</useUIHarness>
+					<useUIThread>true</useUIThread>
+					<argLine>-Xmx1G -XX:MaxPermSize=256m ${tycho-test-jvmArgs}</argLine>
+					<dependencies combine.children="append">
+						<dependency>
+							<artifactId>org.eclipse.jdt.launching</artifactId>
+							<type>eclipse-plugin</type>
+						</dependency>
+						<dependency>
+							<artifactId>org.eclipse.jdt.core</artifactId>
+							<type>eclipse-plugin</type>
+						</dependency>
+					</dependencies>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
