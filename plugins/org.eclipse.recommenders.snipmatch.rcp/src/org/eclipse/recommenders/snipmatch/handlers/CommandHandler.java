@@ -3,8 +3,11 @@ package org.eclipse.recommenders.snipmatch.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.recommenders.snipmatch.rcp.Activator;
+import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.recommenders.snipmatch.rcp.UserEnvironment;
+import org.eclipse.recommenders.snipmatch.search.SearchBox;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Our sample handler extends AbstractHandler, an IHandler base class.
@@ -25,10 +28,13 @@ public class CommandHandler extends AbstractHandler {
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
-		UserEnvironment env = new UserEnvironment();
-
-		if (env.isJavaEditor())
-			Activator.getDefault().showSearchBox();
+		IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+		
+		if (editor instanceof JavaEditor) {
+			UserEnvironment env = new UserEnvironment(editor);
+			SearchBox searchBox = new SearchBox(env);
+			searchBox.show();
+		}
 
 		return null;
 	}
