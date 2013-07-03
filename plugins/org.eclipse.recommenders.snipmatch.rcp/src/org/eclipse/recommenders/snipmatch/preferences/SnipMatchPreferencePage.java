@@ -1,6 +1,7 @@
 package org.eclipse.recommenders.snipmatch.preferences;
 
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.recommenders.snipmatch.rcp.Activator;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -30,6 +31,8 @@ public class SnipMatchPreferencePage extends FieldEditorPreferencePage implement
 	 * editor knows how to save and restore itself.
 	 */
 	public void createFieldEditors() {
+		//addField(new DirectoryFieldEditor(PreferenceConstants.LOCAL_SNIPPETS_REPO, "&Local Snippets Repository:", getFieldEditorParent()));
+		addField(new FileFieldEditor(PreferenceConstants.SEARCH_INDEX_FILE, "&Search Index File:", getFieldEditorParent()));
 
 	}
 
