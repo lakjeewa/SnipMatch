@@ -6,6 +6,8 @@ package org.eclipse.recommenders.test.snipmatch.rcp;
 import static org.junit.Assert.*;
 
 import org.eclipse.recommenders.snipmatch.rcp.UserEnvironment;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.PlatformUI;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -14,7 +16,7 @@ import org.junit.Test;
 
 /**
  * @author Lakjeewa
- *
+ * 
  */
 public class UserEnvironmentTest {
 
@@ -48,14 +50,9 @@ public class UserEnvironmentTest {
 
 	@Test
 	public void testGetSearchBoxAnchor() {
-		UserEnvironment userEnvironment = new UserEnvironment();
+		IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+		UserEnvironment userEnvironment = new UserEnvironment(editor);
 		assertNull(userEnvironment.getSearchBoxAnchor());
-	}
-	
-	@Test
-	public void testIsJavaEditor() {
-		UserEnvironment userEnvironment = new UserEnvironment();
-		assertFalse(userEnvironment.isJavaEditor());
 	}
 
 }
