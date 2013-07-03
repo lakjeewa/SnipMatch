@@ -54,6 +54,11 @@
             id="org.eclipse.recommenders.snipmatch.rcp.searchTextFont"
             label="Search Text Font">
       </fontDefinition>
+      <colorDefinition
+            id="org.eclipse.recommenders.snipmatch.rcp.searchResultBackgroundColor"
+            label="Search Result Background Color"
+            value="255, 255, 255">
+      </colorDefinition>
    </extension>
 
 </plugin>
