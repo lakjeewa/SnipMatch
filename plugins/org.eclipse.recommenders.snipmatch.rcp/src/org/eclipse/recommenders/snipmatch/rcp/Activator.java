@@ -31,7 +31,6 @@ public class Activator extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		
-		searchBox = new SearchBox();
 	}
 
 	/*
