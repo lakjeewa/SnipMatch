@@ -8,6 +8,8 @@ import org.eclipse.recommenders.snipmatch.core.Snippet;
 import org.eclipse.recommenders.snipmatch.rcp.UserEnvironment;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
@@ -41,6 +43,9 @@ public class SearchBox {
 	private String lastQuery;
 	private SnipMatchSearchEngine snipMatchSearchEngine;
 	private UserEnvironment env;
+	private boolean shellFocued = false;
+	private boolean resultDisplayShellFocued = false;
+	private FocusListener focusListener = null;
 
 	public SearchBox(UserEnvironment userEnv) {
 		env = userEnv;
@@ -78,17 +83,19 @@ public class SearchBox {
 			}
 		});
 
-		/*
-		 * searchBoxText.addFocusListener(new FocusListener() {
-		 * 
-		 * @Override public void focusLost(FocusEvent event) { shell.close(); }
-		 * 
-		 * @Override public void focusGained(FocusEvent e) {
-		 * 
-		 * }
-		 * 
-		 * });
-		 */
+		searchBoxText.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent event) {
+				shellFocued = false;
+			}
+
+			@Override
+			public void focusGained(FocusEvent e) {
+				shellFocued = true;
+			}
+
+		});
 
 		shell.pack();
 
@@ -108,6 +115,7 @@ public class SearchBox {
 		if (lastQuery != null && lastQuery.trim().equals(query.trim()))
 			return;
 
+		lastQuery = query;
 		ArrayList<Snippet> searchResult = snipMatchSearchEngine.search(query);
 		displayResults(searchResult);
 	}
@@ -121,20 +129,28 @@ public class SearchBox {
 	 */
 	private void displayResults(ArrayList<Snippet> searchResult) {
 
-		resultDisplayShell = new Shell(shell, SWT.BORDER | SWT.RESIZE);
-		resultDisplayShell.setBackground(searchResultBackgroundColor);
-		resultDisplayShell.setSize(searchBoxWidth, searchBoxHeight);
-		resultDisplayShell.setLayout(new FillLayout(SWT.VERTICAL));
+		if (resultDisplayShell == null) {
+			resultDisplayShell = new Shell(shell, SWT.BORDER | SWT.RESIZE);
+			resultDisplayShell.setBackground(searchResultBackgroundColor);
+			resultDisplayShell.setSize(searchBoxWidth, searchBoxHeight);
+			resultDisplayShell.setLayout(new FillLayout(SWT.VERTICAL));
+		}
 
-		resultDisplayTable = new Table(resultDisplayShell, SWT.SINGLE | SWT.V_SCROLL | SWT.H_SCROLL);
-		resultDisplayTable.setBackground(searchResultBackgroundColor);
-		resultDisplayTable.setLinesVisible(false);
-		TableColumn col = new TableColumn(resultDisplayTable, SWT.LEFT);
-		col.setText("");
+		if (resultDisplayTable == null) {
+			resultDisplayTable = new Table(resultDisplayShell, SWT.SINGLE | SWT.V_SCROLL | SWT.H_SCROLL);
 
-		// resultDisplayTable.addKeyListener(resultDisplayKeyListener);
-		// resultDisplayTable.addMouseListener(resultDisplayMouseListener);
-		resultDisplayTable.setRedraw(false);
+			resultDisplayTable.setBackground(searchResultBackgroundColor);
+			resultDisplayTable.setLinesVisible(false);
+			TableColumn col = new TableColumn(resultDisplayTable, SWT.LEFT);
+			col.setText("");
+
+			// resultDisplayTable.addKeyListener(resultDisplayKeyListener);
+			// resultDisplayTable.addMouseListener(resultDisplayMouseListener);
+			resultDisplayTable.setRedraw(false);
+		} else {
+			resultDisplayTable.removeAll();
+		}
+
 		try {
 			for (Snippet snippet : searchResult) {
 				TableItem item = new TableItem(resultDisplayTable, SWT.NONE);
@@ -152,21 +168,25 @@ public class SearchBox {
 			resultDisplayTable.setRedraw(true);
 		}
 
-/*		resultDisplayShell.addFocusListener(new FocusListener() {
+		resultDisplayTable.addFocusListener(new FocusListener() {
 
 			@Override
 			public void focusLost(FocusEvent event) {
-				// resultDisplayShell.close();
+				resultDisplayShellFocued = false;
+
 			}
 
 			@Override
 			public void focusGained(FocusEvent e) {
-
+				resultDisplayShellFocued = true;
 			}
 
-		});*/
+		});
 
-		resultDisplayShell.open();
+		if (!resultDisplayShell.isDisposed())
+			resultDisplayShell.open();
+
+		shell.setFocus();
 
 	}
 
