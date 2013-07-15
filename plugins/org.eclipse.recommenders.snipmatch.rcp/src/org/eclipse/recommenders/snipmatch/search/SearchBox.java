@@ -8,14 +8,15 @@ import org.eclipse.recommenders.snipmatch.core.Snippet;
 import org.eclipse.recommenders.snipmatch.rcp.UserEnvironment;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -43,9 +44,7 @@ public class SearchBox {
 	private String lastQuery;
 	private SnipMatchSearchEngine snipMatchSearchEngine;
 	private UserEnvironment env;
-	private boolean shellFocued = false;
-	private boolean resultDisplayShellFocued = false;
-	private FocusListener focusListener = null;
+	private EditorFocusListener editorFocusListener = null;
 
 	public SearchBox(UserEnvironment userEnv) {
 		env = userEnv;
@@ -83,19 +82,9 @@ public class SearchBox {
 			}
 		});
 
-		searchBoxText.addFocusListener(new FocusListener() {
 
-			@Override
-			public void focusLost(FocusEvent event) {
-				shellFocued = false;
-			}
-
-			@Override
-			public void focusGained(FocusEvent e) {
-				shellFocued = true;
-			}
-
-		});
+		editorFocusListener = new EditorFocusListener(shell);
+		Display.getDefault().addFilter(SWT.FocusIn, editorFocusListener);  // Add listener to capture a click event on editor
 
 		shell.pack();
 
@@ -105,6 +94,16 @@ public class SearchBox {
 		shell.open();
 		shell.setFocus();
 
+		/**
+		 * When the searchBoxText disposes with shell editorFocusListener should be removed.
+		 */
+		searchBoxText.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				Display.getDefault().removeFilter(SWT.FocusIn, editorFocusListener);
+			}
+		});
+		
 	}
 
 	/**
@@ -168,25 +167,8 @@ public class SearchBox {
 			resultDisplayTable.setRedraw(true);
 		}
 
-		resultDisplayTable.addFocusListener(new FocusListener() {
-
-			@Override
-			public void focusLost(FocusEvent event) {
-				resultDisplayShellFocued = false;
-
-			}
-
-			@Override
-			public void focusGained(FocusEvent e) {
-				resultDisplayShellFocued = true;
-			}
-
-		});
-
 		if (!resultDisplayShell.isDisposed())
-			resultDisplayShell.open();
-
-		shell.setFocus();
+			resultDisplayShell.setVisible(true);
 
 	}
 
