@@ -23,18 +23,8 @@ public class SnipMatchSearchEngine {
 	private static SnipMatchSearchEngine snipMatchSearchEngine = null;
 	private List<IndexRecord> indexRecordsList = null;
 
-	private SnipMatchSearchEngine() {
+	public SnipMatchSearchEngine() {
 		initialize();
-	}
-
-	public static SnipMatchSearchEngine getInstance() {
-		if (snipMatchSearchEngine == null) {
-			snipMatchSearchEngine = new SnipMatchSearchEngine();
-			return snipMatchSearchEngine;
-		} else {
-			return snipMatchSearchEngine;
-		}
-
 	}
 
 	/**
