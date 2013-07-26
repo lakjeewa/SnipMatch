@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.recommenders.snipmatch.core.Snippet;
+import org.eclipse.recommenders.snipmatch.handlers.CommandHandler;
 import org.eclipse.recommenders.snipmatch.rcp.UserEnvironment;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -12,6 +13,8 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
@@ -41,21 +44,21 @@ public class SearchBox {
 	private Table resultDisplayTable = null;
 	private StyledText searchBoxText;
 	private Font searchFont;
-	private String lastQuery;
-	private SnipMatchSearchEngine snipMatchSearchEngine;
 	private UserEnvironment env;
 	private EditorFocusListener editorFocusListener = null;
+	private ArrayList<Snippet> searchResult = null;
+	private ArrayList<Integer> tableIndexResultIndexMap = null;
+	private CommandHandler commandHandler = null;
 
-	public SearchBox(UserEnvironment userEnv) {
+	public SearchBox(UserEnvironment userEnv, CommandHandler handler) {
 		env = userEnv;
+		commandHandler = handler;
 	}
 
 	/**
 	 * Show the SnipMatch search box.
 	 */
 	public void show() {
-
-		snipMatchSearchEngine = SnipMatchSearchEngine.getInstance();
 
 		IThemeManager themeManager = PlatformUI.getWorkbench().getThemeManager();
 		ITheme currentTheme = themeManager.getCurrentTheme();
@@ -78,13 +81,13 @@ public class SearchBox {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
-				handleTyping();
+				commandHandler.handleTyping(searchBoxText.getText());
 			}
 		});
 
-
+		// Add listener to capture a click event on editor
 		editorFocusListener = new EditorFocusListener(shell);
-		Display.getDefault().addFilter(SWT.FocusIn, editorFocusListener);  // Add listener to capture a click event on editor
+		Display.getDefault().addFilter(SWT.FocusIn, editorFocusListener);
 
 		shell.pack();
 
@@ -95,7 +98,8 @@ public class SearchBox {
 		shell.setFocus();
 
 		/**
-		 * When the searchBoxText disposes with shell editorFocusListener should be removed.
+		 * When the searchBoxText disposes with shell editorFocusListener should
+		 * be removed.
 		 */
 		searchBoxText.addDisposeListener(new DisposeListener() {
 			@Override
@@ -103,20 +107,7 @@ public class SearchBox {
 				Display.getDefault().removeFilter(SWT.FocusIn, editorFocusListener);
 			}
 		});
-		
-	}
 
-	/**
-	 * This method handle the type event on the search box.
-	 */
-	private void handleTyping() {
-		String query = searchBoxText.getText();
-		if (lastQuery != null && lastQuery.trim().equals(query.trim()))
-			return;
-
-		lastQuery = query;
-		ArrayList<Snippet> searchResult = snipMatchSearchEngine.search(query);
-		displayResults(searchResult);
 	}
 
 	/**
@@ -126,7 +117,8 @@ public class SearchBox {
 	 * @param searchResult
 	 *            Search results
 	 */
-	private void displayResults(ArrayList<Snippet> searchResult) {
+	public void displayResults(ArrayList<Snippet> result) {
+		searchResult = result;
 
 		if (resultDisplayShell == null) {
 			resultDisplayShell = new Shell(shell, SWT.BORDER | SWT.RESIZE);
@@ -144,18 +136,44 @@ public class SearchBox {
 			col.setText("");
 
 			// resultDisplayTable.addKeyListener(resultDisplayKeyListener);
-			// resultDisplayTable.addMouseListener(resultDisplayMouseListener);
+			resultDisplayTable.addMouseListener(new MouseListener() {
+
+				@Override
+				public void mouseUp(MouseEvent e) {
+					// TODO Auto-generated method stub
+
+				}
+
+				@Override
+				public void mouseDown(MouseEvent e) {
+					int resultIndex = tableIndexResultIndexMap.get(resultDisplayTable.getSelectionIndex());
+					commandHandler.insertResult(resultIndex);
+				}
+
+				@Override
+				public void mouseDoubleClick(MouseEvent e) {
+
+				}
+			});
 			resultDisplayTable.setRedraw(false);
 		} else {
 			resultDisplayTable.removeAll();
 		}
 
 		try {
-			for (Snippet snippet : searchResult) {
-				TableItem item = new TableItem(resultDisplayTable, SWT.NONE);
+			tableIndexResultIndexMap = new ArrayList<Integer>();
+			for (int i = 0; i < searchResult.size(); i++) {
+				Snippet snippet = searchResult.get(i);
 				ArrayList<String> patternList = snippet.getPatterns();
 				String[] patterns = patternList.toArray(new String[patternList.size()]);
-				item.setText(patterns);
+				// item.setText(patterns);
+
+				for (int j = 0; j < patterns.length; j++) {
+					TableItem item = new TableItem(resultDisplayTable, SWT.NONE);
+					item.setText(patterns[j]);
+					tableIndexResultIndexMap.add(i);
+				}
+
 			}
 
 			resultDisplayTable.setFont(searchFont);
