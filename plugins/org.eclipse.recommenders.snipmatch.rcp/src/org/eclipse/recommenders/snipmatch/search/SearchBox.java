@@ -1,6 +1,7 @@
 package org.eclipse.recommenders.snipmatch.search;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontRegistry;
@@ -11,6 +12,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -46,8 +49,8 @@ public class SearchBox {
 	private Font searchFont;
 	private UserEnvironment env;
 	private EditorFocusListener editorFocusListener = null;
-	private ArrayList<Snippet> searchResult = null;
-	private ArrayList<Integer> tableIndexResultIndexMap = null;
+	private List<Snippet> searchResult = null;
+	private List<Integer> tableIndexResultIndexMap = null;
 	private CommandHandler commandHandler = null;
 
 	public SearchBox(UserEnvironment userEnv, CommandHandler handler) {
@@ -85,6 +88,25 @@ public class SearchBox {
 			}
 		});
 
+		searchBoxText.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.keyCode == SWT.ARROW_DOWN || e.keyCode == SWT.ARROW_UP) {
+					if (resultDisplayTable != null) {
+						resultDisplayTable.setFocus();
+						resultDisplayTable.select(0);
+					}
+				}
+			}
+		});
+
 		// Add listener to capture a click event on editor
 		editorFocusListener = new EditorFocusListener(shell);
 		Display.getDefault().addFilter(SWT.FocusIn, editorFocusListener);
@@ -117,7 +139,7 @@ public class SearchBox {
 	 * @param searchResult
 	 *            Search results
 	 */
-	public void displayResults(ArrayList<Snippet> result) {
+	public void displayResults(List<Snippet> result) {
 		searchResult = result;
 
 		if (resultDisplayShell == null) {
@@ -146,15 +168,33 @@ public class SearchBox {
 
 				@Override
 				public void mouseDown(MouseEvent e) {
-					int resultIndex = tableIndexResultIndexMap.get(resultDisplayTable.getSelectionIndex());
-					commandHandler.insertResult(resultIndex);
+
 				}
 
 				@Override
 				public void mouseDoubleClick(MouseEvent e) {
-
+					int resultIndex = tableIndexResultIndexMap.get(resultDisplayTable.getSelectionIndex());
+					commandHandler.selectEntry(resultIndex);
 				}
 			});
+
+			resultDisplayTable.addKeyListener(new KeyListener() {
+
+				@Override
+				public void keyReleased(KeyEvent e) {
+					// TODO Auto-generated method stub
+
+				}
+
+				@Override
+				public void keyPressed(KeyEvent e) {
+					if (e.keyCode == SWT.CR) {
+						int resultIndex = tableIndexResultIndexMap.get(resultDisplayTable.getSelectionIndex());
+						commandHandler.selectEntry(resultIndex);
+					}
+				}
+			});
+
 			resultDisplayTable.setRedraw(false);
 		} else {
 			resultDisplayTable.removeAll();
