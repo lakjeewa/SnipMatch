@@ -1,6 +1,6 @@
 package org.eclipse.recommenders.snipmatch.handlers;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -22,8 +22,8 @@ import org.eclipse.ui.PlatformUI;
  */
 public class CommandHandler extends AbstractHandler {
 
-	private String lastQuery = null;
-	private ArrayList<Snippet> searchResult = null;
+	private String lastQuery;
+	private List<Snippet> searchResult = null;
 	private SnipMatchSearchEngine snipMatchSearchEngine;
 	private SearchBox searchBox = null;
 
@@ -43,7 +43,11 @@ public class CommandHandler extends AbstractHandler {
 
 		if (editor instanceof JavaEditor) {
 			UserEnvironment env = new UserEnvironment(editor);
-			searchBox = new SearchBox(env, this);
+
+			//if (searchBox == null) {
+				searchBox = new SearchBox(env, this);
+			//}
+
 			searchBox.show();
 			snipMatchSearchEngine = new SnipMatchSearchEngine();
 		}
@@ -74,7 +78,7 @@ public class CommandHandler extends AbstractHandler {
 	 * @param resultIndex
 	 *            Index of selected snippet
 	 */
-	public void insertResult(int resultIndex) {
+	public void selectEntry(int resultIndex) {
 		Snippet snippet = searchResult.get(resultIndex);
 		System.out.println(snippet.getCode());
 		TemplateProcessor templateProcessor = new TemplateProcessor();
