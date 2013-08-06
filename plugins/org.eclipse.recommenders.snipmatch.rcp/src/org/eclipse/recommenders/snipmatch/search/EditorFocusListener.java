@@ -21,18 +21,42 @@ public class EditorFocusListener implements Listener {
 
 	@Override
 	public void handleEvent(Event event) {
+
+		Widget widget = event.widget;
+
 		// if (shell != null &&
 		// event.widget.equals(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell()))
 		// shell.dispose();
+
+		// shell.getShell
+
 		if (shell != null) {
-			Widget widget = event.widget;
+
+			if (widget.equals(shell)) {
+				return;
+			}
 			for (Control child : shell.getChildren()) {
 				if (child == widget)
 					return;
 			}
+
+			Shell[] subShells = shell.getShells();
+
+			if (subShells.length > 0) {
+				for (Shell subShell : subShells) {
+
+					if (widget.equals(subShell))
+						return;
+
+					for (Control child : subShell.getChildren()) {
+						if (child == widget)
+							return;
+					}
+				}
+			}
+
+			shell.dispose();
 		}
-		shell.dispose();
 
 	}
-
 }

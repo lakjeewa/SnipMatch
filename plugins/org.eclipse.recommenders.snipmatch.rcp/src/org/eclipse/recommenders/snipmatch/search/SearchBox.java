@@ -10,6 +10,8 @@ import org.eclipse.recommenders.snipmatch.handlers.CommandHandler;
 import org.eclipse.recommenders.snipmatch.rcp.UserEnvironment;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -19,7 +21,7 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -41,7 +43,7 @@ public class SearchBox {
 	private Color searchBoxBackgroundColor;
 	private Color searchResultBackgroundColor;
 	private Shell shell;
-	// private Shell resultDisplayShell = null;
+	private Shell resultDisplayShell = null;
 	private Table resultDisplayTable = null;
 	private StyledText searchBoxText;
 	private Font searchFont;
@@ -70,7 +72,7 @@ public class SearchBox {
 		shell = new Shell(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), SWT.NO_TRIM | SWT.NO_FOCUS | SWT.NO_BACKGROUND);
 		shell.setBackgroundMode(SWT.INHERIT_DEFAULT);
 
-		shell.setLayout(new RowLayout(SWT.VERTICAL)); // ************
+		// shell.setLayout(new RowLayout(SWT.VERTICAL)); // ************
 
 		FontRegistry fontRegistry = currentTheme.getFontRegistry();
 		searchFont = fontRegistry.get("org.eclipse.recommenders.snipmatch.rcp.searchTextFont");
@@ -123,12 +125,12 @@ public class SearchBox {
 		 * When the searchBoxText disposes with shell editorFocusListener should
 		 * be removed.
 		 */
-		// searchBoxText.addDisposeListener(new DisposeListener() {
-		// @Override
-		// public void widgetDisposed(DisposeEvent e) {
-		// Display.getDefault().removeFilter(SWT.FocusIn, editorFocusListener);
-		// }
-		// });
+		searchBoxText.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				Display.getDefault().removeFilter(SWT.FocusIn, editorFocusListener);
+			}
+		});
 
 	}
 
@@ -142,17 +144,17 @@ public class SearchBox {
 	public void displayResults(List<Snippet> result) {
 		searchResult = result;
 
-		// if (resultDisplayShell == null) {
-		// resultDisplayShell = new Shell(shell, SWT.BORDER | SWT.RESIZE);
-		// resultDisplayShell.setBackground(searchResultBackgroundColor);
-		// resultDisplayShell.setSize(searchBoxWidth, searchBoxHeight);
-		// resultDisplayShell.setLayout(new FillLayout(SWT.VERTICAL));
-		// }
+		if (resultDisplayShell == null) {
+			resultDisplayShell = new Shell(shell, SWT.BORDER | SWT.RESIZE);
+			resultDisplayShell.setBackground(searchResultBackgroundColor);
+			resultDisplayShell.setSize(searchBoxWidth, searchBoxHeight);
+			resultDisplayShell.setLayout(new FillLayout(SWT.VERTICAL));
+		}
 
 		if (resultDisplayTable == null) {
-			// resultDisplayTable = new Table(resultDisplayShell, SWT.SINGLE |
-			// SWT.V_SCROLL | SWT.H_SCROLL);
-			resultDisplayTable = new Table(shell, SWT.SINGLE | SWT.V_SCROLL | SWT.H_SCROLL | SWT.BORDER);
+			resultDisplayTable = new Table(resultDisplayShell, SWT.SINGLE | SWT.V_SCROLL | SWT.H_SCROLL);
+			// resultDisplayTable = new Table(shell, SWT.SINGLE | SWT.V_SCROLL |
+			// SWT.H_SCROLL | SWT.BORDER);
 			resultDisplayTable.setBackground(searchResultBackgroundColor);
 			resultDisplayTable.setLinesVisible(false);
 			TableColumn col = new TableColumn(resultDisplayTable, SWT.LEFT);
@@ -220,18 +222,17 @@ public class SearchBox {
 			resultDisplayTable.setFont(searchFont);
 			resultDisplayTable.getColumn(0).pack();
 			Point anchor = env.getSearchBoxAnchor();
-			// resultDisplayShell.setLocation(anchor.x, anchor.y + 35);
+			resultDisplayShell.setLocation(anchor.x, anchor.y + 35);
 			resultDisplayTable.setVisible(true);
 
 		} finally {
 			resultDisplayTable.setRedraw(true);
 		}
 
-		// if (!resultDisplayShell.isDisposed())
-		// resultDisplayShell.setVisible(true);
-
-		shell.pack();
-		shell.open();
+		if (!resultDisplayShell.isDisposed())
+			resultDisplayShell.setVisible(true);
+		// shell.pack();
+		// shell.open();
 	}
 
 }
