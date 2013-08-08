@@ -1,18 +1,20 @@
 package org.eclipse.recommenders.snipmatch.core;
 
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.internal.corext.template.java.ImportsResolver;
-import org.eclipse.jdt.internal.corext.template.java.StaticImportResolver;
+import org.eclipse.jdt.internal.corext.template.java.JavaContext;
+import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
+import org.eclipse.jdt.internal.ui.text.template.contentassist.TemplateProposal;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextOperationTarget;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.jface.text.templates.DocumentTemplateContext;
 import org.eclipse.jface.text.templates.GlobalTemplateVariables;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateContextType;
-import org.eclipse.jface.text.templates.TemplateProposal;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
@@ -29,7 +31,9 @@ public class TemplateProcessor {
 
 	/**
 	 * Insert the selected snippet into editor
-	 * @param snippet User selected snippet
+	 * 
+	 * @param snippet
+	 *            User selected snippet
 	 */
 	public void insertTemplate(Snippet snippet) {
 
@@ -56,11 +60,14 @@ public class TemplateProcessor {
 		contextType.addResolver(new GlobalTemplateVariables.Time());
 		contextType.addResolver(new GlobalTemplateVariables.User());
 		contextType.addResolver(new GlobalTemplateVariables.Year());
-		ImportsResolver importsResolver = new ImportsResolver();
-		contextType.addResolver(importsResolver);
-		contextType.addResolver(new StaticImportResolver());
+		contextType.addResolver(new ImportsResolver("import", "Import Statement"));
 
-		TemplateContext ctx = new DocumentTemplateContext(contextType, sourceViewer.getDocument(), range.x, range.y);
+		ICompilationUnit cu = (ICompilationUnit) EditorUtility.getEditorInputJavaElement(activeEditor, false);
+		Position p = new Position(range.x, range.y);
+
+		TemplateContext ctx = new JavaContext(contextType, sourceViewer.getDocument(), p, cu);
+
+		//TemplateContext ctx = new DocumentTemplateContext(contextType, sourceViewer.getDocument(), range.x, range.y);
 
 		TemplateProposal proposal = new TemplateProposal(template, ctx, region, null);
 		proposal.apply(sourceViewer, (char) 0, 0, 0);
