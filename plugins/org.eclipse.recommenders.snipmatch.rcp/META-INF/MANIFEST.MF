@@ -19,3 +19,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.eclipse.recommenders.snipmatch.handlers,
  org.eclipse.recommenders.snipmatch.preferences,
  org.eclipse.recommenders.snipmatch.rcp
+Import-Package: org.eclipse.ui.texteditor.templates

@@ -60,18 +60,5 @@
             value="255, 255, 255">
       </colorDefinition>
    </extension>
-   <extension
-         point="org.eclipse.ui.editors.templates">
-      <contextType
-            class="org.eclipse.recommenders.snipmatch.rcp.JavaTemplateContextType"
-            id="org.eclipse.recommenders.snipmatch.rcp.javaContextType"
-            registryId="org.eclipse.jdt.ui.CompilationUnitEditor">
-      </contextType>
-      <resolver
-            class="org.eclipse.recommenders.snipmatch.rcp.JavaTemplateVariableResolver"
-            contextTypeId="java"
-            type="org.eclipse.recommenders.snipmatch.rcp.javaResolver">
-      </resolver>
-   </extension>
 
 </plugin>
