@@ -13,8 +13,14 @@ public class PreferenceConstants {
 
 	public static final String P_STRING = "stringPreference";
 
-	//public static final String LOCAL_SNIPPETS_REPO = "localSnippetsRepo";
-	
-    public static final String SEARCH_INDEX_FILE = "searchIndexfile";
-	
+	public static final String LOCAL_SNIPPETS_REPO = "localSnippetsRepo";
+
+	public static final String SEARCH_INDEX_DIR = "searchIndexDir";
+
+	public static final String UPDATE_INDEX = "Update Index";
+
+	//public static final int BUTTON_WIDTH = 95;
+
+	//public static final int BUTTON_HEIGHT = 25;
+
 }

@@ -1,5 +1,6 @@
 package org.eclipse.recommenders.snipmatch.handlers;
 
+import java.io.File;
 import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -8,9 +9,13 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.recommenders.snipmatch.core.Snippet;
 import org.eclipse.recommenders.snipmatch.core.TemplateProcessor;
+import org.eclipse.recommenders.snipmatch.preferences.PreferenceConstants;
+import org.eclipse.recommenders.snipmatch.rcp.Activator;
 import org.eclipse.recommenders.snipmatch.rcp.UserEnvironment;
+import org.eclipse.recommenders.snipmatch.search.IndexCreator;
 import org.eclipse.recommenders.snipmatch.search.SearchBox;
 import org.eclipse.recommenders.snipmatch.search.SnipMatchSearchEngine;
+import org.eclipse.recommenders.snipmatch.util.SnipMatchMessageDialog;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 
@@ -38,18 +43,19 @@ public class CommandHandler extends AbstractHandler {
 	 * from the application context.
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
+		String indexFilePath = Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.SEARCH_INDEX_DIR);
+		if (isIndexUpdated(indexFilePath)) {
+			IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 
-		IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+			if (editor instanceof JavaEditor) {
+				UserEnvironment env = new UserEnvironment(editor);
 
-		if (editor instanceof JavaEditor) {
-			UserEnvironment env = new UserEnvironment(editor);
-
-			//if (searchBox == null) {
 				searchBox = new SearchBox(env, this);
-			//}
 
-			searchBox.show();
-			snipMatchSearchEngine = new SnipMatchSearchEngine();
+				searchBox.show();
+
+				snipMatchSearchEngine = new SnipMatchSearchEngine(indexFilePath);
+			}
 		}
 
 		return null;
@@ -67,7 +73,9 @@ public class CommandHandler extends AbstractHandler {
 			return;
 		} else {
 			lastQuery = query;
-			searchResult = snipMatchSearchEngine.search(query);
+			// searchResult = snipMatchSearchEngine.search(query);
+			String indexPath = "E:\\GSoC\\Lucene_Snippet_Repo\\indexDir";
+			searchResult = snipMatchSearchEngine.luceneSearch(query, indexPath);
 			searchBox.displayResults(searchResult);
 		}
 	}
@@ -83,5 +91,23 @@ public class CommandHandler extends AbstractHandler {
 		System.out.println(snippet.getCode());
 		TemplateProcessor templateProcessor = new TemplateProcessor();
 		templateProcessor.insertTemplate(snippet);
+	}
+
+	/**
+	 * This method check whether the index has been updated.
+	 * 
+	 * @param indexDirPath
+	 *            Path to index directory
+	 * @return true or false
+	 */
+	public boolean isIndexUpdated(String indexDirPath) {
+		File indexDir = new File(indexDirPath);
+		if (!indexDir.isDirectory() || !indexDir.exists()) {
+			SnipMatchMessageDialog
+					.openError("Index has not been updated", "Please enter the paths and update the SnipMatch search index in preference window.");
+			return false;
+		} else {
+			return true;
+		}
 	}
 }
