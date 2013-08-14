@@ -32,11 +32,11 @@ import com.google.gson.reflect.TypeToken;
  * 
  */
 public class SnipMatchSearchEngine {
-	private String indexFilePath = null;
+	private String indexDirPath = null;
 	private List<IndexRecord> indexRecordsList = null;
 
-	public SnipMatchSearchEngine(String indexFilePath) {
-		this.indexFilePath = indexFilePath;
+	public SnipMatchSearchEngine(String indexDirPath) {
+		this.indexDirPath = indexDirPath;
 	}
 
 	// /**
@@ -72,7 +72,7 @@ public class SnipMatchSearchEngine {
 	// * Initialize search engine.
 	// */
 	// public void initialize() {
-	// File indexFile = new File(indexFilePath);
+	// File indexFile = new File(indexDirPath);
 	// loadIndexFile(indexFile);
 	// }
 	//
@@ -97,13 +97,13 @@ public class SnipMatchSearchEngine {
 	 *            Path to index directory
 	 * @return Search result
 	 */
-	public ArrayList<Snippet> luceneSearch(String queryLine, String indexPath) {
+	public ArrayList<Snippet> luceneSearch(String queryLine) {
 		ArrayList<Snippet> searchResult = new ArrayList<Snippet>();
 
 		if (queryLine.trim() != "") {
 			IndexReader reader = null;
 			try {
-				reader = IndexReader.open(FSDirectory.open(new File(indexPath)));
+				reader = IndexReader.open(FSDirectory.open(new File(indexDirPath)));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -111,7 +111,7 @@ public class SnipMatchSearchEngine {
 
 			IndexSearcher searcher = new IndexSearcher(reader);
 			Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_35);
-			QueryParser parser = new QueryParser(Version.LUCENE_31, "summary", analyzer);
+			QueryParser parser = new QueryParser(Version.LUCENE_35, "summary", analyzer);
 			Query query = null;
 			try {
 				query = parser.parse(queryLine);
