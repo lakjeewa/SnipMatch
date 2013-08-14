@@ -6,6 +6,6 @@ Bundle-Version: 1.0.4.qualifier
 Fragment-Host: org.eclipse.recommenders.snipmatch.rcp
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.junit4;bundle-version="4.8.1"
+ org.junit
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
