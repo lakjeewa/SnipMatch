@@ -43,8 +43,8 @@ public class CommandHandler extends AbstractHandler {
 	 * from the application context.
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		String indexFilePath = Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.SEARCH_INDEX_DIR);
-		if (isIndexUpdated(indexFilePath)) {
+		String indexDirPath = Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.SEARCH_INDEX_DIR);
+		if (isIndexUpdated(indexDirPath)) {
 			IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 
 			if (editor instanceof JavaEditor) {
@@ -54,7 +54,7 @@ public class CommandHandler extends AbstractHandler {
 
 				searchBox.show();
 
-				snipMatchSearchEngine = new SnipMatchSearchEngine(indexFilePath);
+				snipMatchSearchEngine = new SnipMatchSearchEngine(indexDirPath);
 			}
 		}
 
@@ -74,8 +74,7 @@ public class CommandHandler extends AbstractHandler {
 		} else {
 			lastQuery = query;
 			// searchResult = snipMatchSearchEngine.search(query);
-			String indexPath = "E:\\GSoC\\Lucene_Snippet_Repo\\indexDir";
-			searchResult = snipMatchSearchEngine.luceneSearch(query, indexPath);
+			searchResult = snipMatchSearchEngine.luceneSearch(query);
 			searchBox.displayResults(searchResult);
 		}
 	}
