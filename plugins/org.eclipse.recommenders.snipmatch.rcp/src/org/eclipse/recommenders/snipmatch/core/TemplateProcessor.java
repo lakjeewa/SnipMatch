@@ -1,12 +1,18 @@
 package org.eclipse.recommenders.snipmatch.core;
 
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.internal.corext.template.java.ElementTypeResolver;
 import org.eclipse.jdt.internal.corext.template.java.ImportsResolver;
 import org.eclipse.jdt.internal.corext.template.java.JavaContext;
+import org.eclipse.jdt.internal.corext.template.java.LinkResolver;
+import org.eclipse.jdt.internal.corext.template.java.NameResolver;
+import org.eclipse.jdt.internal.corext.template.java.TypeResolver;
+import org.eclipse.jdt.internal.corext.template.java.VarResolver;
 import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.jdt.internal.ui.text.template.contentassist.TemplateProposal;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextOperationTarget;
+import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -60,10 +66,10 @@ public class TemplateProcessor {
 
 		Point range = sourceViewer.getSelectedRange();
 
-		Template template = new Template("", "", "org.eclipse.jdt.internal.corext.template.java.JavaContextType", snippet.getCode(), true);
+		Template template = new Template("", "", "SnipMatch-Java-Context", snippet.getCode(), true);
 		IRegion region = new Region(range.x, range.y);
 
-		TemplateContextType contextType = new TemplateContextType("org.eclipse.jdt.internal.corext.template.java.JavaContextType");
+		TemplateContextType contextType = new TemplateContextType("SnipMatch-Java-Context");
 
 		contextType.addResolver(new GlobalTemplateVariables.Cursor());
 		contextType.addResolver(new GlobalTemplateVariables.WordSelection());
@@ -75,12 +81,33 @@ public class TemplateProcessor {
 		contextType.addResolver(new GlobalTemplateVariables.Year());
 		contextType.addResolver(new ImportsResolver("import", "Import Statement"));
 
+		VarResolver varResolver = new VarResolver();
+		varResolver.setType("var");
+		contextType.addResolver(varResolver);
+
+		TypeResolver typeResolver = new TypeResolver();
+		typeResolver.setType("newType");
+		contextType.addResolver(typeResolver);
+
+		LinkResolver linkResolver = new LinkResolver();
+		linkResolver.setType("link");
+		contextType.addResolver(linkResolver);
+
+		NameResolver nameResolver = new NameResolver();
+		nameResolver.setType("newName");
+		contextType.addResolver(nameResolver);
+
+		ElementTypeResolver elementTypeResolver = new ElementTypeResolver();
+		elementTypeResolver.setType("elemType");
+		contextType.addResolver(elementTypeResolver);
+
 		ICompilationUnit cu = (ICompilationUnit) EditorUtility.getEditorInputJavaElement(activeEditor, false);
 		Position p = new Position(range.x, range.y);
 
 		TemplateContext ctx = new JavaContext(contextType, sourceViewer.getDocument(), p, cu);
 
 		TemplateProposal proposal = new TemplateProposal(template, ctx, region, null);
+
 		proposal.apply(sourceViewer, (char) 0, 0, 0);
 
 	}
