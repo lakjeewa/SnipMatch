@@ -12,7 +12,6 @@ import org.eclipse.recommenders.snipmatch.core.TemplateProcessor;
 import org.eclipse.recommenders.snipmatch.preferences.PreferenceConstants;
 import org.eclipse.recommenders.snipmatch.rcp.Activator;
 import org.eclipse.recommenders.snipmatch.rcp.UserEnvironment;
-import org.eclipse.recommenders.snipmatch.search.IndexCreator;
 import org.eclipse.recommenders.snipmatch.search.SearchBox;
 import org.eclipse.recommenders.snipmatch.search.SnipMatchSearchEngine;
 import org.eclipse.recommenders.snipmatch.util.SnipMatchMessageDialog;
@@ -27,7 +26,7 @@ import org.eclipse.ui.PlatformUI;
  */
 public class CommandHandler extends AbstractHandler {
 
-	private String lastQuery;
+	private String lastQuery = "";
 	private List<Snippet> searchResult = null;
 	private SnipMatchSearchEngine snipMatchSearchEngine;
 	private SearchBox searchBox = null;
@@ -70,7 +69,7 @@ public class CommandHandler extends AbstractHandler {
 	public void handleTyping(String query) {
 
 		if (lastQuery != null && lastQuery.trim().equals(query.trim())) {
-			return;
+			return; // If the query has not been changed
 		} else {
 			lastQuery = query;
 			// searchResult = snipMatchSearchEngine.search(query);

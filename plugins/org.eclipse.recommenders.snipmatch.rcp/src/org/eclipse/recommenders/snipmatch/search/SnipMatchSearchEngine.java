@@ -114,38 +114,47 @@ public class SnipMatchSearchEngine {
 			QueryParser parser = new QueryParser(Version.LUCENE_35, "summary", analyzer);
 			Query query = null;
 			try {
-				query = parser.parse(queryLine);
+				query = parser.parse(queryLine + "*"); // Add star to enable
+														// Wildcard Searches
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
 
-			ScoreDoc[] hits = null;
-			try {
-				hits = searcher.search(query, null, 100).scoreDocs;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			for (int i = 0; i < hits.length; i++) {
-				Document doc = null;
+			if (query != null) {
+				ScoreDoc[] hits = null;
 				try {
-					doc = searcher.doc(hits[i].doc);
+					hits = searcher.search(query, null, 100).scoreDocs;
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				String path = doc.get("path");
-				File jsonFile = new File(path);
-				if (jsonFile.exists()) {
-					Snippet snippet = GsonUtil.deserialize(jsonFile, Snippet.class);
-					searchResult.add(snippet);
-				}
-			}
 
-			try {
-				searcher.close();
-				reader.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+				for (int i = 0; i < hits.length; i++) {
+					Document doc = null;
+					try {
+						doc = searcher.doc(hits[i].doc);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					String path = doc.get("path");
+					File jsonFile = new File(path);
+					if (jsonFile.exists()) {
+						try {
+							Snippet snippet = GsonUtil.deserialize(jsonFile, Snippet.class);
+							searchResult.add(snippet);
+						} catch (Exception e) { // Catch all the exception at
+												// deserializing json files
+							// e.printStackTrace();
+							continue;
+						}
+					}
+				}
+
+				try {
+					searcher.close();
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		return searchResult;
