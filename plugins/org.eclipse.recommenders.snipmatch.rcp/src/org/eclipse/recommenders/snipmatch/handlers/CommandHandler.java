@@ -1,8 +1,11 @@
 package org.eclipse.recommenders.snipmatch.handlers;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.store.FSDirectory;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -26,7 +29,7 @@ import org.eclipse.ui.PlatformUI;
  */
 public class CommandHandler extends AbstractHandler {
 
-	private String lastQuery = "";
+	private String lastQuery;
 	private List<Snippet> searchResult = null;
 	private SnipMatchSearchEngine snipMatchSearchEngine;
 	private SearchBox searchBox = null;
@@ -42,17 +45,16 @@ public class CommandHandler extends AbstractHandler {
 	 * from the application context.
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		String indexDirPath = Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.SEARCH_INDEX_DIR);
+		String localSnippetRepoDirPath = Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.LOCAL_SNIPPETS_REPO);
+		String indexDirPath = localSnippetRepoDirPath + System.getProperty("file.separator") + "index";
+
 		if (isIndexUpdated(indexDirPath)) {
 			IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 
 			if (editor instanceof JavaEditor) {
 				UserEnvironment env = new UserEnvironment(editor);
-
 				searchBox = new SearchBox(env, this);
-
 				searchBox.show();
-
 				snipMatchSearchEngine = new SnipMatchSearchEngine(indexDirPath);
 			}
 		}
@@ -99,13 +101,30 @@ public class CommandHandler extends AbstractHandler {
 	 * @return true or false
 	 */
 	public boolean isIndexUpdated(String indexDirPath) {
+		boolean indexExists = false;
 		File indexDir = new File(indexDirPath);
+
 		if (!indexDir.isDirectory() || !indexDir.exists()) {
-			SnipMatchMessageDialog
-					.openError("Index has not been updated", "Please enter the paths and update the SnipMatch search index in preference window.");
+
+			SnipMatchMessageDialog.openError("Index has not been updated", "Please enter the path and update the SnipMatch search index in preference window.");
 			return false;
+
 		} else {
-			return true;
+
+			try {
+				indexExists = IndexReader.indexExists(FSDirectory.open(indexDir));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			if (indexExists) {
+				return true;
+			} else {
+				SnipMatchMessageDialog.openError("Index has not been updated",
+						"Please enter the path and update the SnipMatch search index in preference window.");
+				return false;
+			}
+
 		}
 	}
 }

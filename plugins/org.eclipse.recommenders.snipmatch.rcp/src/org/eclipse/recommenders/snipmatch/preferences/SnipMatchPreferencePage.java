@@ -29,7 +29,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class SnipMatchPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
 	private DirectoryFieldEditor localSnippetsRepo = null;
-	private DirectoryFieldEditor searchIndexDir = null;
+	// private DirectoryFieldEditor searchIndexDir = null;
 	private Button updateIndex = null;
 
 	public SnipMatchPreferencePage() {
@@ -45,9 +45,11 @@ public class SnipMatchPreferencePage extends FieldEditorPreferencePage implement
 	 */
 	public void createFieldEditors() {
 		localSnippetsRepo = new DirectoryFieldEditor(PreferenceConstants.LOCAL_SNIPPETS_REPO, "&Local Snippets Repository:", getFieldEditorParent());
-		searchIndexDir = new DirectoryFieldEditor(PreferenceConstants.SEARCH_INDEX_DIR, "&Search Index Directory:", getFieldEditorParent());
+		// searchIndexDir = new
+		// DirectoryFieldEditor(PreferenceConstants.SEARCH_INDEX_DIR,
+		// "&Search Index Directory:", getFieldEditorParent());
 		addField(localSnippetsRepo);
-		addField(searchIndexDir);
+		// addField(searchIndexDir);
 
 		updateIndex = new Button(getFieldEditorParent(), SWT.PUSH);
 		updateIndex.setText(PreferenceConstants.UPDATE_INDEX);
@@ -60,9 +62,13 @@ public class SnipMatchPreferencePage extends FieldEditorPreferencePage implement
 			public void widgetSelected(SelectionEvent e) {
 				storedCurrentValues();
 				String localSnippetRepoDirPath = Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.LOCAL_SNIPPETS_REPO);
-				String indexDirPath = Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.SEARCH_INDEX_DIR);
+				// String indexDirPath =
+				// Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.SEARCH_INDEX_DIR);
+				String indexDirPath = localSnippetRepoDirPath + System.getProperty("file.separator") + "index";
 
-				if (isValidPaths(localSnippetRepoDirPath, indexDirPath)) {
+				if (isValidPath(localSnippetRepoDirPath)) {
+					File indexDir = new File(indexDirPath);
+					indexDir.mkdir();
 					IndexCreator indexCreator = new IndexCreator();
 					indexCreator.createIndex(localSnippetRepoDirPath, indexDirPath);
 					SnipMatchMessageDialog.openInformation("Index Updated", "Lucene Index Updated");
@@ -83,34 +89,26 @@ public class SnipMatchPreferencePage extends FieldEditorPreferencePage implement
 
 	public void storedCurrentValues() {
 		localSnippetsRepo.store();
-		searchIndexDir.store();
+		// searchIndexDir.store();
 	}
 
 	/**
-	 * This method validate the user given file paths before create or update the index.
-	 * @param localSnippetRepoDirPath Path to local snippets repository
-	 * @param indexDirPath Path to Lucene index directory
+	 * This method validate the user given file paths before create or update
+	 * the index.
+	 * 
+	 * @param localSnippetRepoDirPath
+	 *            Path to local snippets repository
 	 * @return true or false
 	 */
-	public boolean isValidPaths(String localSnippetRepoDirPath, String indexDirPath) {
+	public boolean isValidPath(String localSnippetRepoDirPath) {
 
-		if ((localSnippetRepoDirPath == null || "".equals(localSnippetRepoDirPath)) && (indexDirPath == null || "".equals(indexDirPath))) {
-			SnipMatchMessageDialog.openError("Invalid Path", "Enter Snippet Repository and Index Directory Paths.");
-			return false;
-		} else if (localSnippetRepoDirPath == null || "".equals(localSnippetRepoDirPath)) {
-			SnipMatchMessageDialog.openError("Invalid Path", "Enter Snippet Repository Path.");
-			return false;
-		} else if (indexDirPath == null || "".equals(indexDirPath)) {
-			SnipMatchMessageDialog.openError("Invalid Path", "Enter Index Directory Path.");
+		if ((localSnippetRepoDirPath == null || "".equals(localSnippetRepoDirPath))) {
+			SnipMatchMessageDialog.openError("Invalid Path", "Enter Snippet Repositor Path.");
 			return false;
 		} else {
 			File repoDir = new File(localSnippetRepoDirPath);
-			File indexDir = new File(indexDirPath);
 			if (!repoDir.isDirectory() || !repoDir.exists()) {
 				SnipMatchMessageDialog.openError("Invalid Path", "Snippet Repository Directory does not exist.");
-				return false;
-			} else if (!indexDir.isDirectory() || !indexDir.exists()) {
-				SnipMatchMessageDialog.openError("Invalid Path", "Index Directory does not exist.");
 				return false;
 			} else {
 				return true;
@@ -118,5 +116,51 @@ public class SnipMatchPreferencePage extends FieldEditorPreferencePage implement
 		}
 
 	}
+
+	// /**
+	// * This method validate the user given file paths before create or update
+	// * the index.
+	// *
+	// * @param localSnippetRepoDirPath
+	// * Path to local snippets repository
+	// * @param indexDirPath
+	// * Path to Lucene index directory
+	// * @return true or false
+	// */
+	// public boolean isValidPaths(String localSnippetRepoDirPath, String
+	// indexDirPath) {
+	//
+	// if ((localSnippetRepoDirPath == null ||
+	// "".equals(localSnippetRepoDirPath)) && (indexDirPath == null ||
+	// "".equals(indexDirPath))) {
+	// SnipMatchMessageDialog.openError("Invalid Path",
+	// "Enter Snippet Repository and Index Directory Paths.");
+	// return false;
+	// } else if (localSnippetRepoDirPath == null ||
+	// "".equals(localSnippetRepoDirPath)) {
+	// SnipMatchMessageDialog.openError("Invalid Path",
+	// "Enter Snippet Repository Path.");
+	// return false;
+	// } else if (indexDirPath == null || "".equals(indexDirPath)) {
+	// SnipMatchMessageDialog.openError("Invalid Path",
+	// "Enter Index Directory Path.");
+	// return false;
+	// } else {
+	// File repoDir = new File(localSnippetRepoDirPath);
+	// File indexDir = new File(indexDirPath);
+	// if (!repoDir.isDirectory() || !repoDir.exists()) {
+	// SnipMatchMessageDialog.openError("Invalid Path",
+	// "Snippet Repository Directory does not exist.");
+	// return false;
+	// } else if (!indexDir.isDirectory() || !indexDir.exists()) {
+	// SnipMatchMessageDialog.openError("Invalid Path",
+	// "Index Directory does not exist.");
+	// return false;
+	// } else {
+	// return true;
+	// }
+	// }
+	//
+	// }
 
 }
