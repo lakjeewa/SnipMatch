@@ -41,11 +41,11 @@ public class CommandHandler extends AbstractHandler {
     }
 
     /**
-     * the command has been executed, so extract extract the needed information
-     * from the application context.
+     * the command has been executed, so extract extract the needed information from the application context.
      */
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        String localSnippetRepoDirPath = Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.LOCAL_SNIPPETS_REPO);
+        String localSnippetRepoDirPath = Activator.getDefault().getPreferenceStore()
+                .getString(PreferenceConstants.LOCAL_SNIPPETS_REPO);
         String indexDirPath = localSnippetRepoDirPath + System.getProperty("file.separator") + "index";
 
         if (isIndexUpdated(indexDirPath)) {
@@ -74,7 +74,6 @@ public class CommandHandler extends AbstractHandler {
             return; // If the query has not been changed
         } else {
             lastQuery = query;
-            // searchResult = snipMatchSearchEngine.search(query);
             searchResult = snipMatchSearchEngine.luceneSearch(query);
             searchBox.displayResults(searchResult);
         }
@@ -88,7 +87,6 @@ public class CommandHandler extends AbstractHandler {
      */
     public void selectEntry(int resultIndex) {
         Snippet snippet = searchResult.get(resultIndex);
-        System.out.println(snippet.getCode());
         TemplateProcessor templateProcessor = new TemplateProcessor();
         templateProcessor.insertTemplate(snippet);
     }
@@ -106,7 +104,8 @@ public class CommandHandler extends AbstractHandler {
 
         if (!indexDir.isDirectory() || !indexDir.exists()) {
 
-            SnipMatchMessageDialog.openError("Index has not been updated", "Please enter the path and update the SnipMatch search index in preference window.");
+            SnipMatchMessageDialog.openError("Index has not been updated",
+                    "Please enter the path and update the SnipMatch search index in preference window.");
             return false;
 
         } else {
