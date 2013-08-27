@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.eclipse.recommenders</groupId>
 	<artifactId>snipmatch-aggregator</artifactId>
-	<version>1-SNAPSHOT</version>
+	<version>1.100.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>plugins/org.eclipse.recommenders.snipmatch.rcp</module>
