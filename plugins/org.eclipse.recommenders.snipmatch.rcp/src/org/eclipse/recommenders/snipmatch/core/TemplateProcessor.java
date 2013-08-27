@@ -25,12 +25,32 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 
 /**
- * TemplateProcessor process the selected snippet and insert the code into
- * editor
+ * TemplateProcessor process the selected snippet and insert the code into editor
  * 
  * 
  */
 public class TemplateProcessor {
+
+    private TemplateContextType javaContextType;
+    private static TemplateProcessor templateProcessor = null;
+    private String contexId = "SnipMatch-Java-Context";
+
+    private TemplateProcessor() {
+        javaContextType = createContextType();
+    }
+
+    /**
+     * Return a instance of TemplateProcessor
+     * 
+     * @return TemplateProcessor
+     */
+    public static TemplateProcessor getInstance() {
+        if (templateProcessor == null) {
+            templateProcessor = new TemplateProcessor();
+        }
+
+        return templateProcessor;
+    }
 
     /**
      * Insert the selected snippet into editor
@@ -40,25 +60,8 @@ public class TemplateProcessor {
      */
     public void insertTemplate(Snippet snippet) {
 
-        // AbstractTextEditor activeEditor = (AbstractTextEditor)
-        // PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-        //
-        // activeEditor.setFocus();
-        //
-        // ISourceViewer sourceViewer = (ISourceViewer)
-        // activeEditor.getAdapter(ITextOperationTarget.class);
-        //
-        // Template template = new Template("name", "description",
-        // "java-statements", snippet.getCode(), true);
-        //
-        // IDocument doc =
-        // activeEditor.getDocumentProvider().getDocument(activeEditor.getEditorInput());
-        // SnipMatchJavaTemplatesPage page = new
-        // SnipMatchJavaTemplatesPage(activeEditor, sourceViewer);
-        // page.insertTemplate(template, doc);
-        // page.dispose();
-
-        AbstractTextEditor activeEditor = (AbstractTextEditor) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+        AbstractTextEditor activeEditor = (AbstractTextEditor) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                .getActivePage().getActiveEditor();
 
         activeEditor.setFocus();
 
@@ -66,10 +69,28 @@ public class TemplateProcessor {
 
         Point range = sourceViewer.getSelectedRange();
 
-        Template template = new Template("", "", "SnipMatch-Java-Context", snippet.getCode(), true);
+        Template template = new Template("", "", contexId, snippet.getCode(), true);
         IRegion region = new Region(range.x, range.y);
 
-        TemplateContextType contextType = new TemplateContextType("SnipMatch-Java-Context");
+        ICompilationUnit cu = (ICompilationUnit) EditorUtility.getEditorInputJavaElement(activeEditor, false);
+        Position p = new Position(range.x, range.y);
+
+        TemplateContext ctx = new JavaContext(javaContextType, sourceViewer.getDocument(), p, cu);
+
+        TemplateProposal proposal = new TemplateProposal(template, ctx, region, null);
+
+        proposal.apply(sourceViewer, (char) 0, 0, 0);
+
+    }
+
+    /**
+     * Create context type with variable resolvers
+     * 
+     * @return context type
+     */
+    private TemplateContextType createContextType() {
+
+        TemplateContextType contextType = new TemplateContextType(contexId);
 
         contextType.addResolver(new GlobalTemplateVariables.Cursor());
         contextType.addResolver(new GlobalTemplateVariables.WordSelection());
@@ -101,14 +122,7 @@ public class TemplateProcessor {
         elementTypeResolver.setType("elemType");
         contextType.addResolver(elementTypeResolver);
 
-        ICompilationUnit cu = (ICompilationUnit) EditorUtility.getEditorInputJavaElement(activeEditor, false);
-        Position p = new Position(range.x, range.y);
-
-        TemplateContext ctx = new JavaContext(contextType, sourceViewer.getDocument(), p, cu);
-
-        TemplateProposal proposal = new TemplateProposal(template, ctx, region, null);
-
-        proposal.apply(sourceViewer, (char) 0, 0, 0);
+        return contextType;
 
     }
 

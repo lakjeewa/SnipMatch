@@ -87,7 +87,7 @@ public class CommandHandler extends AbstractHandler {
      */
     public void selectEntry(int resultIndex) {
         Snippet snippet = searchResult.get(resultIndex);
-        TemplateProcessor templateProcessor = new TemplateProcessor();
+        TemplateProcessor templateProcessor = TemplateProcessor.getInstance();
         templateProcessor.insertTemplate(snippet);
     }
 
