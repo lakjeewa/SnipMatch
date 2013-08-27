@@ -67,12 +67,12 @@ public class SearchBox {
         ITheme currentTheme = themeManager.getCurrentTheme();
         ColorRegistry colorRegistry = currentTheme.getColorRegistry();
         searchBoxBackgroundColor = colorRegistry.get("org.eclipse.recommenders.snipmatch.rcp.searchboxbackground");
-        searchResultBackgroundColor = colorRegistry.get("org.eclipse.recommenders.snipmatch.rcp.searchResultBackgroundColor");
+        searchResultBackgroundColor = colorRegistry
+                .get("org.eclipse.recommenders.snipmatch.rcp.searchResultBackgroundColor");
 
-        shell = new Shell(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), SWT.NO_TRIM | SWT.NO_FOCUS | SWT.NO_BACKGROUND);
+        shell = new Shell(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), SWT.NO_TRIM | SWT.NO_FOCUS
+                | SWT.NO_BACKGROUND);
         shell.setBackgroundMode(SWT.INHERIT_DEFAULT);
-
-        // shell.setLayout(new RowLayout(SWT.VERTICAL)); // ************
 
         FontRegistry fontRegistry = currentTheme.getFontRegistry();
         searchFont = fontRegistry.get("org.eclipse.recommenders.snipmatch.rcp.searchTextFont");
@@ -122,8 +122,7 @@ public class SearchBox {
         shell.setFocus();
 
         /**
-         * When the searchBoxText disposes with shell editorFocusListener should
-         * be removed.
+         * When the searchBoxText disposes with shell editorFocusListener should be removed.
          */
         searchBoxText.addDisposeListener(new DisposeListener() {
             @Override
@@ -135,8 +134,7 @@ public class SearchBox {
     }
 
     /**
-     * This method display the search result given by the SnipMatch search
-     * engine.
+     * This method display the search result given by the SnipMatch search engine.
      * 
      * @param searchResult
      *            Search results
@@ -153,14 +151,11 @@ public class SearchBox {
 
         if (resultDisplayTable == null) {
             resultDisplayTable = new Table(resultDisplayShell, SWT.SINGLE | SWT.V_SCROLL | SWT.H_SCROLL);
-            // resultDisplayTable = new Table(shell, SWT.SINGLE | SWT.V_SCROLL |
-            // SWT.H_SCROLL | SWT.BORDER);
             resultDisplayTable.setBackground(searchResultBackgroundColor);
             resultDisplayTable.setLinesVisible(false);
             TableColumn col = new TableColumn(resultDisplayTable, SWT.LEFT);
             col.setText("");
 
-            // resultDisplayTable.addKeyListener(resultDisplayKeyListener);
             resultDisplayTable.addMouseListener(new MouseListener() {
 
                 @Override
@@ -194,6 +189,22 @@ public class SearchBox {
                     if (e.keyCode == SWT.CR) {
                         int resultIndex = tableIndexResultIndexMap.get(resultDisplayTable.getSelectionIndex());
                         commandHandler.selectEntry(resultIndex);
+                    } else if ((e.keyCode >= 97 && e.keyCode <= 122) || (e.keyCode >= 48 && e.keyCode <= 57)
+                            || (e.keyCode >= 16777258 && e.keyCode <= 16777273) || e.keyCode == 32) {
+                        // 97-122 Character
+                        // 48-57 Digits
+                        // 16777258-16777273 Num Locks
+                        // 32 Space
+                        searchBoxText.append(Character.toString(e.character));
+                        searchBoxText.setSelection(searchBoxText.getText().length());
+                        searchBoxText.setFocus();
+
+                    } else if (e.keyCode == 8) {
+                        // 8 Backspace
+                        int length = searchBoxText.getText().length();
+                        if (length != 0)
+                            searchBoxText.replaceTextRange(length - 1, 1, "");
+                        searchBoxText.setFocus();
                     }
                 }
             });
@@ -209,7 +220,6 @@ public class SearchBox {
                 Snippet snippet = searchResult.get(i);
                 ArrayList<String> patternList = snippet.getPatterns();
                 String[] patterns = patternList.toArray(new String[patternList.size()]);
-                // item.setText(patterns);
 
                 for (int j = 0; j < patterns.length; j++) {
                     TableItem item = new TableItem(resultDisplayTable, SWT.NONE);
@@ -231,8 +241,6 @@ public class SearchBox {
 
         if (!resultDisplayShell.isDisposed())
             resultDisplayShell.setVisible(true);
-        // shell.pack();
-        // shell.open();
     }
 
 }
