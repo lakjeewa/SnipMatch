@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.eclipse.recommenders</groupId>
 		<artifactId>tests</artifactId>
-		<version>1.0.4-SNAPSHOT</version>
+		<version>1.100.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>org.eclipse.recommenders.tests.snipmatch.rcp</artifactId>
@@ -36,4 +36,28 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+        <profile>
+            <id>mac</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.eclipse.tycho</groupId>
+                            <artifactId>tycho-surefire-plugin</artifactId>
+                            <configuration>
+                                <!-- ${tycho.testArgLine} as set by jacoco-maven-plugin -->
+                                <argLine>-XstartOnFirstThread ${tycho.testArgLine}</argLine>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+    </profiles>
 </project>
