@@ -13,50 +13,50 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class EditorFocusListener implements Listener {
 
-	private Shell shell = null;
+    private Shell shell = null;
 
-	public EditorFocusListener(Shell s) {
-		shell = s;
-	}
+    public EditorFocusListener(Shell s) {
+        shell = s;
+    }
 
-	@Override
-	public void handleEvent(Event event) {
+    @Override
+    public void handleEvent(Event event) {
 
-		Widget widget = event.widget;
+        Widget widget = event.widget;
 
-		// if (shell != null &&
-		// event.widget.equals(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell()))
-		// shell.dispose();
+        // if (shell != null &&
+        // event.widget.equals(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell()))
+        // shell.dispose();
 
-		// shell.getShell
+        // shell.getShell
 
-		if (shell != null) {
+        if (shell != null) {
 
-			if (widget.equals(shell)) {
-				return;
-			}
-			for (Control child : shell.getChildren()) {
-				if (child == widget)
-					return;
-			}
+            if (widget.equals(shell)) {
+                return;
+            }
+            for (Control child : shell.getChildren()) {
+                if (child == widget)
+                    return;
+            }
 
-			Shell[] subShells = shell.getShells();
+            Shell[] subShells = shell.getShells();
 
-			if (subShells.length > 0) {
-				for (Shell subShell : subShells) {
+            if (subShells.length > 0) {
+                for (Shell subShell : subShells) {
 
-					if (widget.equals(subShell))
-						return;
+                    if (widget.equals(subShell))
+                        return;
 
-					for (Control child : subShell.getChildren()) {
-						if (child == widget)
-							return;
-					}
-				}
-			}
+                    for (Control child : subShell.getChildren()) {
+                        if (child == widget)
+                            return;
+                    }
+                }
+            }
 
-			shell.dispose();
-		}
+            shell.dispose();
+        }
 
-	}
+    }
 }

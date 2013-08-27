@@ -29,102 +29,102 @@ import org.eclipse.ui.PlatformUI;
  */
 public class CommandHandler extends AbstractHandler {
 
-	private String lastQuery;
-	private List<Snippet> searchResult = null;
-	private SnipMatchSearchEngine snipMatchSearchEngine;
-	private SearchBox searchBox = null;
+    private String lastQuery;
+    private List<Snippet> searchResult = null;
+    private SnipMatchSearchEngine snipMatchSearchEngine;
+    private SearchBox searchBox = null;
 
-	/**
-	 * The constructor.
-	 */
-	public CommandHandler() {
-	}
+    /**
+     * The constructor.
+     */
+    public CommandHandler() {
+    }
 
-	/**
-	 * the command has been executed, so extract extract the needed information
-	 * from the application context.
-	 */
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		String localSnippetRepoDirPath = Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.LOCAL_SNIPPETS_REPO);
-		String indexDirPath = localSnippetRepoDirPath + System.getProperty("file.separator") + "index";
+    /**
+     * the command has been executed, so extract extract the needed information
+     * from the application context.
+     */
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        String localSnippetRepoDirPath = Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.LOCAL_SNIPPETS_REPO);
+        String indexDirPath = localSnippetRepoDirPath + System.getProperty("file.separator") + "index";
 
-		if (isIndexUpdated(indexDirPath)) {
-			IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+        if (isIndexUpdated(indexDirPath)) {
+            IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 
-			if (editor instanceof JavaEditor) {
-				UserEnvironment env = new UserEnvironment(editor);
-				searchBox = new SearchBox(env, this);
-				searchBox.show();
-				snipMatchSearchEngine = new SnipMatchSearchEngine(indexDirPath);
-			}
-		}
+            if (editor instanceof JavaEditor) {
+                UserEnvironment env = new UserEnvironment(editor);
+                searchBox = new SearchBox(env, this);
+                searchBox.show();
+                snipMatchSearchEngine = new SnipMatchSearchEngine(indexDirPath);
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * This method handle the type action on the search query text box
-	 * 
-	 * @param query
-	 *            search query
-	 */
-	public void handleTyping(String query) {
+    /**
+     * This method handle the type action on the search query text box
+     * 
+     * @param query
+     *            search query
+     */
+    public void handleTyping(String query) {
 
-		if (lastQuery != null && lastQuery.trim().equals(query.trim())) {
-			return; // If the query has not been changed
-		} else {
-			lastQuery = query;
-			// searchResult = snipMatchSearchEngine.search(query);
-			searchResult = snipMatchSearchEngine.luceneSearch(query);
-			searchBox.displayResults(searchResult);
-		}
-	}
+        if (lastQuery != null && lastQuery.trim().equals(query.trim())) {
+            return; // If the query has not been changed
+        } else {
+            lastQuery = query;
+            // searchResult = snipMatchSearchEngine.search(query);
+            searchResult = snipMatchSearchEngine.luceneSearch(query);
+            searchBox.displayResults(searchResult);
+        }
+    }
 
-	/**
-	 * This method insert the code snippet into the editor
-	 * 
-	 * @param resultIndex
-	 *            Index of selected snippet
-	 */
-	public void selectEntry(int resultIndex) {
-		Snippet snippet = searchResult.get(resultIndex);
-		System.out.println(snippet.getCode());
-		TemplateProcessor templateProcessor = new TemplateProcessor();
-		templateProcessor.insertTemplate(snippet);
-	}
+    /**
+     * This method insert the code snippet into the editor
+     * 
+     * @param resultIndex
+     *            Index of selected snippet
+     */
+    public void selectEntry(int resultIndex) {
+        Snippet snippet = searchResult.get(resultIndex);
+        System.out.println(snippet.getCode());
+        TemplateProcessor templateProcessor = new TemplateProcessor();
+        templateProcessor.insertTemplate(snippet);
+    }
 
-	/**
-	 * This method check whether the index has been updated.
-	 * 
-	 * @param indexDirPath
-	 *            Path to index directory
-	 * @return true or false
-	 */
-	public boolean isIndexUpdated(String indexDirPath) {
-		boolean indexExists = false;
-		File indexDir = new File(indexDirPath);
+    /**
+     * This method check whether the index has been updated.
+     * 
+     * @param indexDirPath
+     *            Path to index directory
+     * @return true or false
+     */
+    public boolean isIndexUpdated(String indexDirPath) {
+        boolean indexExists = false;
+        File indexDir = new File(indexDirPath);
 
-		if (!indexDir.isDirectory() || !indexDir.exists()) {
+        if (!indexDir.isDirectory() || !indexDir.exists()) {
 
-			SnipMatchMessageDialog.openError("Index has not been updated", "Please enter the path and update the SnipMatch search index in preference window.");
-			return false;
+            SnipMatchMessageDialog.openError("Index has not been updated", "Please enter the path and update the SnipMatch search index in preference window.");
+            return false;
 
-		} else {
+        } else {
 
-			try {
-				indexExists = IndexReader.indexExists(FSDirectory.open(indexDir));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+            try {
+                indexExists = IndexReader.indexExists(FSDirectory.open(indexDir));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-			if (indexExists) {
-				return true;
-			} else {
-				SnipMatchMessageDialog.openError("Index has not been updated",
-						"Please enter the path and update the SnipMatch search index in preference window.");
-				return false;
-			}
+            if (indexExists) {
+                return true;
+            } else {
+                SnipMatchMessageDialog.openError("Index has not been updated",
+                        "Please enter the path and update the SnipMatch search index in preference window.");
+                return false;
+            }
 
-		}
-	}
+        }
+    }
 }

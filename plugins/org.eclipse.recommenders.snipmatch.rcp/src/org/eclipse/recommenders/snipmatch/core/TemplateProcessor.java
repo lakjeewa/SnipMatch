@@ -32,84 +32,84 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
  */
 public class TemplateProcessor {
 
-	/**
-	 * Insert the selected snippet into editor
-	 * 
-	 * @param snippet
-	 *            User selected snippet
-	 */
-	public void insertTemplate(Snippet snippet) {
+    /**
+     * Insert the selected snippet into editor
+     * 
+     * @param snippet
+     *            User selected snippet
+     */
+    public void insertTemplate(Snippet snippet) {
 
-		// AbstractTextEditor activeEditor = (AbstractTextEditor)
-		// PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-		//
-		// activeEditor.setFocus();
-		//
-		// ISourceViewer sourceViewer = (ISourceViewer)
-		// activeEditor.getAdapter(ITextOperationTarget.class);
-		//
-		// Template template = new Template("name", "description",
-		// "java-statements", snippet.getCode(), true);
-		//
-		// IDocument doc =
-		// activeEditor.getDocumentProvider().getDocument(activeEditor.getEditorInput());
-		// SnipMatchJavaTemplatesPage page = new
-		// SnipMatchJavaTemplatesPage(activeEditor, sourceViewer);
-		// page.insertTemplate(template, doc);
-		// page.dispose();
+        // AbstractTextEditor activeEditor = (AbstractTextEditor)
+        // PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+        //
+        // activeEditor.setFocus();
+        //
+        // ISourceViewer sourceViewer = (ISourceViewer)
+        // activeEditor.getAdapter(ITextOperationTarget.class);
+        //
+        // Template template = new Template("name", "description",
+        // "java-statements", snippet.getCode(), true);
+        //
+        // IDocument doc =
+        // activeEditor.getDocumentProvider().getDocument(activeEditor.getEditorInput());
+        // SnipMatchJavaTemplatesPage page = new
+        // SnipMatchJavaTemplatesPage(activeEditor, sourceViewer);
+        // page.insertTemplate(template, doc);
+        // page.dispose();
 
-		AbstractTextEditor activeEditor = (AbstractTextEditor) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+        AbstractTextEditor activeEditor = (AbstractTextEditor) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 
-		activeEditor.setFocus();
+        activeEditor.setFocus();
 
-		ISourceViewer sourceViewer = (ISourceViewer) activeEditor.getAdapter(ITextOperationTarget.class);
+        ISourceViewer sourceViewer = (ISourceViewer) activeEditor.getAdapter(ITextOperationTarget.class);
 
-		Point range = sourceViewer.getSelectedRange();
+        Point range = sourceViewer.getSelectedRange();
 
-		Template template = new Template("", "", "SnipMatch-Java-Context", snippet.getCode(), true);
-		IRegion region = new Region(range.x, range.y);
+        Template template = new Template("", "", "SnipMatch-Java-Context", snippet.getCode(), true);
+        IRegion region = new Region(range.x, range.y);
 
-		TemplateContextType contextType = new TemplateContextType("SnipMatch-Java-Context");
+        TemplateContextType contextType = new TemplateContextType("SnipMatch-Java-Context");
 
-		contextType.addResolver(new GlobalTemplateVariables.Cursor());
-		contextType.addResolver(new GlobalTemplateVariables.WordSelection());
-		contextType.addResolver(new GlobalTemplateVariables.Date());
-		contextType.addResolver(new GlobalTemplateVariables.Dollar());
-		contextType.addResolver(new GlobalTemplateVariables.LineSelection());
-		contextType.addResolver(new GlobalTemplateVariables.Time());
-		contextType.addResolver(new GlobalTemplateVariables.User());
-		contextType.addResolver(new GlobalTemplateVariables.Year());
-		contextType.addResolver(new ImportsResolver("import", "Import Statement"));
+        contextType.addResolver(new GlobalTemplateVariables.Cursor());
+        contextType.addResolver(new GlobalTemplateVariables.WordSelection());
+        contextType.addResolver(new GlobalTemplateVariables.Date());
+        contextType.addResolver(new GlobalTemplateVariables.Dollar());
+        contextType.addResolver(new GlobalTemplateVariables.LineSelection());
+        contextType.addResolver(new GlobalTemplateVariables.Time());
+        contextType.addResolver(new GlobalTemplateVariables.User());
+        contextType.addResolver(new GlobalTemplateVariables.Year());
+        contextType.addResolver(new ImportsResolver("import", "Import Statement"));
 
-		VarResolver varResolver = new VarResolver();
-		varResolver.setType("var");
-		contextType.addResolver(varResolver);
+        VarResolver varResolver = new VarResolver();
+        varResolver.setType("var");
+        contextType.addResolver(varResolver);
 
-		TypeResolver typeResolver = new TypeResolver();
-		typeResolver.setType("newType");
-		contextType.addResolver(typeResolver);
+        TypeResolver typeResolver = new TypeResolver();
+        typeResolver.setType("newType");
+        contextType.addResolver(typeResolver);
 
-		LinkResolver linkResolver = new LinkResolver();
-		linkResolver.setType("link");
-		contextType.addResolver(linkResolver);
+        LinkResolver linkResolver = new LinkResolver();
+        linkResolver.setType("link");
+        contextType.addResolver(linkResolver);
 
-		NameResolver nameResolver = new NameResolver();
-		nameResolver.setType("newName");
-		contextType.addResolver(nameResolver);
+        NameResolver nameResolver = new NameResolver();
+        nameResolver.setType("newName");
+        contextType.addResolver(nameResolver);
 
-		ElementTypeResolver elementTypeResolver = new ElementTypeResolver();
-		elementTypeResolver.setType("elemType");
-		contextType.addResolver(elementTypeResolver);
+        ElementTypeResolver elementTypeResolver = new ElementTypeResolver();
+        elementTypeResolver.setType("elemType");
+        contextType.addResolver(elementTypeResolver);
 
-		ICompilationUnit cu = (ICompilationUnit) EditorUtility.getEditorInputJavaElement(activeEditor, false);
-		Position p = new Position(range.x, range.y);
+        ICompilationUnit cu = (ICompilationUnit) EditorUtility.getEditorInputJavaElement(activeEditor, false);
+        Position p = new Position(range.x, range.y);
 
-		TemplateContext ctx = new JavaContext(contextType, sourceViewer.getDocument(), p, cu);
+        TemplateContext ctx = new JavaContext(contextType, sourceViewer.getDocument(), p, cu);
 
-		TemplateProposal proposal = new TemplateProposal(template, ctx, region, null);
+        TemplateProposal proposal = new TemplateProposal(template, ctx, region, null);
 
-		proposal.apply(sourceViewer, (char) 0, 0, 0);
+        proposal.apply(sourceViewer, (char) 0, 0, 0);
 
-	}
+    }
 
 }
