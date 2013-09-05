@@ -1,8 +1,7 @@
-package org.eclipse.recommenders.snipmatch.search;
+package org.eclipse.recommenders.internal.snipmatch.search;
 
 /**
- * This class is used to represent one record in the search index file. This
- * sores the path and summary of a snippet.
+ * This class is used to represent one record in the search index file. This sores the path and summary of a snippet.
  * 
  */
 public class IndexRecord {

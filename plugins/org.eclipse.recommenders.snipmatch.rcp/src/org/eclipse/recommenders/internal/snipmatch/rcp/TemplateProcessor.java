@@ -1,4 +1,4 @@
-package org.eclipse.recommenders.snipmatch.core;
+package org.eclipse.recommenders.internal.snipmatch.rcp;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.internal.corext.template.java.ElementTypeResolver;
@@ -12,7 +12,6 @@ import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.jdt.internal.ui.text.template.contentassist.TemplateProposal;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextOperationTarget;
-import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -20,19 +19,19 @@ import org.eclipse.jface.text.templates.GlobalTemplateVariables;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateContextType;
+import org.eclipse.recommenders.snipmatch.Snippet;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 
 /**
  * TemplateProcessor process the selected snippet and insert the code into editor
- * 
- * 
  */
+// TODO MB: should we make this an application singleton via Guice?
 public class TemplateProcessor {
 
+    private static TemplateProcessor INSTANCE = null;
     private TemplateContextType javaContextType;
-    private static TemplateProcessor templateProcessor = null;
     private String contexId = "SnipMatch-Java-Context";
 
     private TemplateProcessor() {
@@ -45,11 +44,10 @@ public class TemplateProcessor {
      * @return TemplateProcessor
      */
     public static TemplateProcessor getInstance() {
-        if (templateProcessor == null) {
-            templateProcessor = new TemplateProcessor();
+        if (INSTANCE == null) {
+            INSTANCE = new TemplateProcessor();
         }
-
-        return templateProcessor;
+        return INSTANCE;
     }
 
     /**
@@ -59,28 +57,18 @@ public class TemplateProcessor {
      *            User selected snippet
      */
     public void insertTemplate(Snippet snippet) {
-
         AbstractTextEditor activeEditor = (AbstractTextEditor) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().getActiveEditor();
-
         activeEditor.setFocus();
-
         ISourceViewer sourceViewer = (ISourceViewer) activeEditor.getAdapter(ITextOperationTarget.class);
-
         Point range = sourceViewer.getSelectedRange();
-
         Template template = new Template("", "", contexId, snippet.getCode(), true);
         IRegion region = new Region(range.x, range.y);
-
         ICompilationUnit cu = (ICompilationUnit) EditorUtility.getEditorInputJavaElement(activeEditor, false);
         Position p = new Position(range.x, range.y);
-
         TemplateContext ctx = new JavaContext(javaContextType, sourceViewer.getDocument(), p, cu);
-
         TemplateProposal proposal = new TemplateProposal(template, ctx, region, null);
-
         proposal.apply(sourceViewer, (char) 0, 0, 0);
-
     }
 
     /**
@@ -91,7 +79,6 @@ public class TemplateProcessor {
     private TemplateContextType createContextType() {
 
         TemplateContextType contextType = new TemplateContextType(contexId);
-
         contextType.addResolver(new GlobalTemplateVariables.Cursor());
         contextType.addResolver(new GlobalTemplateVariables.WordSelection());
         contextType.addResolver(new GlobalTemplateVariables.Date());
@@ -123,7 +110,5 @@ public class TemplateProcessor {
         contextType.addResolver(elementTypeResolver);
 
         return contextType;
-
     }
-
 }

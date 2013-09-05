@@ -1,4 +1,4 @@
-package org.eclipse.recommenders.snipmatch.search;
+package org.eclipse.recommenders.internal.snipmatch.search;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,12 +13,12 @@ import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
-import org.eclipse.recommenders.snipmatch.core.Snippet;
+import org.eclipse.recommenders.snipmatch.Snippet;
+import org.eclipse.recommenders.utils.Throws;
 import org.eclipse.recommenders.utils.gson.GsonUtil;
 
 /**
- * This class creates the index for given directory of snippet files using
- * Apache Lucene
+ * This class creates the index for given directory of snippet files using Apache Lucene
  * 
  */
 public class IndexCreator {
@@ -26,38 +26,28 @@ public class IndexCreator {
     /**
      * This method create the Lucene index
      * 
-     * @param snippetsRepoPath
+     * @param snippetsdir
      *            Path to snippets directory
      * @param indexDirectoryPath
      *            Path to index directory
      */
-    public void createIndex(String snippetsRepoPath, String indexDirectoryPath) {
+    public void createIndex(File snippetsdir, File indexdir) {
 
-        File dir = new File(indexDirectoryPath);
-
-        if (!dir.exists()) {
-            dir.mkdirs();
+        if (!indexdir.exists()) {
+            indexdir.mkdirs();
         }
 
-        Directory indexDir = null;
         try {
-            indexDir = FSDirectory.open(dir);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_35);
-        IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_35, analyzer);
-        iwc.setOpenMode(OpenMode.CREATE);
-
-        try {
-            IndexWriter writer = new IndexWriter(indexDir, iwc);
-            indexSnippets(writer, snippetsRepoPath);
+            Directory index = FSDirectory.open(indexdir);
+            Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_35);
+            IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_35, analyzer);
+            config.setOpenMode(OpenMode.CREATE);
+            IndexWriter writer = new IndexWriter(index, config);
+            indexSnippets(writer, snippetsdir);
             writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Throws.throwUnhandledException(e);
         }
-
     }
 
     /**
@@ -68,8 +58,7 @@ public class IndexCreator {
      * @param snippetsRepoPath
      *            Path to snippets directory
      */
-    private void indexSnippets(IndexWriter writer, String snippetsRepoPath) {
-        File snippetsDir = new File(snippetsRepoPath);
+    private void indexSnippets(IndexWriter writer, File snippetsDir) {
 
         if (snippetsDir.exists() && snippetsDir.canRead() && snippetsDir.isDirectory()) {
 

@@ -1,11 +1,11 @@
 /**
  * 
  */
-package org.eclipse.recommenders.test.snipmatch.rcp;
+package org.eclipse.recommenders.internal.snipmatch.rcp.search;
 
 import static org.junit.Assert.*;
 
-import org.eclipse.recommenders.snipmatch.rcp.UserEnvironment;
+import org.eclipse.recommenders.internal.snipmatch.search.UserEnvironment;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 import org.junit.After;

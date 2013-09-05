@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: SnipMatch
 Bundle-SymbolicName: org.eclipse.recommenders.snipmatch.rcp;singleton:=true
 Bundle-Version: 1.100.0.qualifier
-Bundle-Activator: org.eclipse.recommenders.snipmatch.rcp.Activator
+Bundle-Activator: org.eclipse.recommenders.internal.snipmatch.rcp.SnipmatchActivator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.jdt.ui,
@@ -14,10 +14,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.editors,
  com.google.gson,
  com.google.guava,
- org.apache.lucene;bundle-version="3.5.0"
+ org.apache.lucene;bundle-version="3.5.0",
+ org.apache.commons.lang3;bundle-version="3.1.0",
+ org.slf4j.api;bundle-version="1.7.2"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: org.eclipse.recommenders.snipmatch.handlers,
- org.eclipse.recommenders.snipmatch.preferences,
- org.eclipse.recommenders.snipmatch.rcp
-Import-Package: org.eclipse.ui.texteditor.templates
+Export-Package: org.eclipse.recommenders.snipmatch

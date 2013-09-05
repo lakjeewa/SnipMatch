@@ -1,4 +1,4 @@
-package org.eclipse.recommenders.snipmatch.search;
+package org.eclipse.recommenders.internal.snipmatch.search;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,8 +15,10 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
-import org.eclipse.recommenders.snipmatch.core.Snippet;
+import org.eclipse.recommenders.snipmatch.Snippet;
 import org.eclipse.recommenders.utils.gson.GsonUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -24,10 +26,11 @@ import org.eclipse.recommenders.utils.gson.GsonUtil;
  * 
  */
 public class SnipMatchSearchEngine {
-    private String indexDirPath = null;
+    Logger log = LoggerFactory.getLogger(getClass());
+    private File indexdir = null;
 
-    public SnipMatchSearchEngine(String indexDirPath) {
-        this.indexDirPath = indexDirPath;
+    public SnipMatchSearchEngine(File indexdir) {
+        this.indexdir = indexdir;
     }
 
     /**
@@ -45,10 +48,9 @@ public class SnipMatchSearchEngine {
         if (queryLine.trim() != "") {
             IndexReader reader = null;
             try {
-                reader = IndexReader.open(FSDirectory.open(new File(indexDirPath)));
+                reader = IndexReader.open(FSDirectory.open(indexdir));
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                log.error("Failed to open snippet search index.", e);
             }
 
             IndexSearcher searcher = new IndexSearcher(reader);
@@ -58,7 +60,7 @@ public class SnipMatchSearchEngine {
             try {
                 query = parser.parse(queryLine.trim() + "*"); // Add star to enable Wildcard Searches
             } catch (ParseException e) {
-                e.printStackTrace();
+                log.error("Failed parse search query.", e);
             }
 
             if (query != null) {
@@ -66,7 +68,7 @@ public class SnipMatchSearchEngine {
                 try {
                     hits = searcher.search(query, null, 100).scoreDocs;
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("Failed search index.", e);
                 }
 
                 for (int i = 0; i < hits.length; i++) {
@@ -82,9 +84,11 @@ public class SnipMatchSearchEngine {
                         try {
                             Snippet snippet = GsonUtil.deserialize(jsonFile, Snippet.class);
                             searchResult.add(snippet);
-                        } catch (Exception e) { // Catch all the exception at
-                                                // deserializing json files
+                        } catch (Exception e) {
+                            // Catch all the exception at
+                            // deserializing json files
                             // e.printStackTrace();
+                            log.error("Failed deserialize json snippet.", e);
                             continue;
                         }
                     }
@@ -94,7 +98,7 @@ public class SnipMatchSearchEngine {
                     searcher.close();
                     reader.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("Failed close index.", e);
                 }
             }
         }

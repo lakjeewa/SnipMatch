@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="org.eclipse.recommenders.snipmatch.preferences.SnipMatchPreferencePage"
+            class="org.eclipse.recommenders.internal.snipmatch.rcp.PreferencePage"
             id="org.eclipse.recommenders.snipmatch.rpc.preferences.SnipMatchPreferencePage"
             name="SnipMatch"
             category="org.eclipse.recommenders.rcp.category.preferences">
@@ -13,10 +13,10 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="org.eclipse.recommenders.snipmatch.preferences.PreferenceInitializer">
+            class="org.eclipse.recommenders.internal.snipmatch.rcp.PreferenceInitializer">
       </initializer>
       <initializer
-            class="org.eclipse.recommenders.snipmatch.preferences.PreferenceInitializer">
+            class="org.eclipse.recommenders.internal.snipmatch.rcp.PreferenceInitializer">
       </initializer>
    </extension>
    <extension
@@ -29,7 +29,7 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="org.eclipse.recommenders.snipmatch.handlers.CommandHandler"
+            class="org.eclipse.recommenders.internal.snipmatch.rcp.SearchHandler"
             commandId="org.eclipse.recommenders.snipmatch.rpc.commands.search">
       </handler>
    </extension>

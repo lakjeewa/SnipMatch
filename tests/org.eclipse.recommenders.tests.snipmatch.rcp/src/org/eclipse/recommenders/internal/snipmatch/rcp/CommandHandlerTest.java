@@ -1,4 +1,4 @@
-package org.eclipse.recommenders.test.snipmatch.handlers;
+package org.eclipse.recommenders.internal.snipmatch.rcp;
 
 import static org.junit.Assert.*;
 

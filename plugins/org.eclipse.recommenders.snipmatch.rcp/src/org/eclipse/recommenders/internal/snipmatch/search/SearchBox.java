@@ -1,21 +1,27 @@
-package org.eclipse.recommenders.snipmatch.search;
+package org.eclipse.recommenders.internal.snipmatch.search;
+
+import static com.google.common.collect.Iterables.toArray;
+import static org.eclipse.recommenders.internal.snipmatch.rcp.Constants.P_SEARCH_BOX_BACKGROUND;
+import static org.eclipse.recommenders.internal.snipmatch.rcp.Constants.P_SEARCH_RESULTS_BACKGROUND;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontRegistry;
-import org.eclipse.recommenders.snipmatch.core.Snippet;
-import org.eclipse.recommenders.snipmatch.handlers.CommandHandler;
-import org.eclipse.recommenders.snipmatch.rcp.UserEnvironment;
+import org.eclipse.recommenders.internal.snipmatch.rcp.Constants;
+import org.eclipse.recommenders.internal.snipmatch.rcp.SearchHandler;
+import org.eclipse.recommenders.snipmatch.Snippet;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Color;
@@ -32,30 +38,28 @@ import org.eclipse.ui.themes.ITheme;
 import org.eclipse.ui.themes.IThemeManager;
 
 /**
- * 
  * This class creates the SnipMatch search box.
- * 
  */
 public class SearchBox {
 
     private final int searchBoxWidth = 360;
     private final int searchBoxHeight = 200;
-    private Color searchBoxBackgroundColor;
-    private Color searchResultBackgroundColor;
+    private Color searchboxBg;
+    private Color searchresultsBg;
     private Shell shell;
     private Shell resultDisplayShell = null;
     private Table resultDisplayTable = null;
-    private StyledText searchBoxText;
-    private Font searchFont;
+    private StyledText searchboxText;
+    private Font searchboxFont;
     private UserEnvironment env;
     private EditorFocusListener editorFocusListener = null;
     private List<Snippet> searchResult = null;
     private List<Integer> tableIndexResultIndexMap = null;
-    private CommandHandler commandHandler = null;
+    private SearchHandler searchhandler = null;
 
-    public SearchBox(UserEnvironment userEnv, CommandHandler handler) {
+    public SearchBox(UserEnvironment userEnv, SearchHandler handler) {
         env = userEnv;
-        commandHandler = handler;
+        searchhandler = handler;
     }
 
     /**
@@ -66,37 +70,29 @@ public class SearchBox {
         IThemeManager themeManager = PlatformUI.getWorkbench().getThemeManager();
         ITheme currentTheme = themeManager.getCurrentTheme();
         ColorRegistry colorRegistry = currentTheme.getColorRegistry();
-        searchBoxBackgroundColor = colorRegistry.get("org.eclipse.recommenders.snipmatch.rcp.searchboxbackground");
-        searchResultBackgroundColor = colorRegistry
-                .get("org.eclipse.recommenders.snipmatch.rcp.searchResultBackgroundColor");
+        searchboxBg = colorRegistry.get(P_SEARCH_BOX_BACKGROUND);
+        searchresultsBg = colorRegistry.get(P_SEARCH_RESULTS_BACKGROUND);
 
         shell = new Shell(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), SWT.NO_TRIM | SWT.NO_FOCUS
                 | SWT.NO_BACKGROUND);
         shell.setBackgroundMode(SWT.INHERIT_DEFAULT);
 
         FontRegistry fontRegistry = currentTheme.getFontRegistry();
-        searchFont = fontRegistry.get("org.eclipse.recommenders.snipmatch.rcp.searchTextFont");
-        searchBoxText = new StyledText(shell, SWT.BORDER);
-        searchBoxText.setBackground(searchBoxBackgroundColor);
-        searchBoxText.setMargins(8, 6, 8, 6);
-        searchBoxText.setFont(searchFont);
-        searchBoxText.setSize(searchBoxWidth, searchBoxText.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-
-        searchBoxText.addModifyListener(new ModifyListener() {
+        searchboxFont = fontRegistry.get("org.eclipse.recommenders.snipmatch.rcp.searchTextFont");
+        searchboxText = new StyledText(shell, SWT.BORDER);
+        searchboxText.setBackground(searchboxBg);
+        searchboxText.setMargins(8, 6, 8, 6);
+        searchboxText.setFont(searchboxFont);
+        searchboxText.setSize(searchBoxWidth, searchboxText.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+        searchboxText.addModifyListener(new ModifyListener() {
 
             @Override
             public void modifyText(ModifyEvent e) {
-                commandHandler.handleTyping(searchBoxText.getText());
+                searchhandler.handleTyping(searchboxText.getText());
             }
         });
 
-        searchBoxText.addKeyListener(new KeyListener() {
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                // TODO Auto-generated method stub
-
-            }
+        searchboxText.addKeyListener(new KeyAdapter() {
 
             @Override
             public void keyPressed(KeyEvent e) {
@@ -124,7 +120,7 @@ public class SearchBox {
         /**
          * When the searchBoxText disposes with shell editorFocusListener should be removed.
          */
-        searchBoxText.addDisposeListener(new DisposeListener() {
+        searchboxText.addDisposeListener(new DisposeListener() {
             @Override
             public void widgetDisposed(DisposeEvent e) {
                 Display.getDefault().removeFilter(SWT.FocusIn, editorFocusListener);
@@ -144,67 +140,50 @@ public class SearchBox {
 
         if (resultDisplayShell == null) {
             resultDisplayShell = new Shell(shell, SWT.BORDER | SWT.RESIZE);
-            resultDisplayShell.setBackground(searchResultBackgroundColor);
+            resultDisplayShell.setBackground(searchresultsBg);
             resultDisplayShell.setSize(searchBoxWidth, searchBoxHeight);
             resultDisplayShell.setLayout(new FillLayout(SWT.VERTICAL));
         }
 
         if (resultDisplayTable == null) {
             resultDisplayTable = new Table(resultDisplayShell, SWT.SINGLE | SWT.V_SCROLL | SWT.H_SCROLL);
-            resultDisplayTable.setBackground(searchResultBackgroundColor);
+            resultDisplayTable.setBackground(searchresultsBg);
             resultDisplayTable.setLinesVisible(false);
             TableColumn col = new TableColumn(resultDisplayTable, SWT.LEFT);
             col.setText("");
 
-            resultDisplayTable.addMouseListener(new MouseListener() {
-
-                @Override
-                public void mouseUp(MouseEvent e) {
-                    // TODO Auto-generated method stub
-
-                }
-
-                @Override
-                public void mouseDown(MouseEvent e) {
-
-                }
+            resultDisplayTable.addMouseListener(new MouseAdapter() {
 
                 @Override
                 public void mouseDoubleClick(MouseEvent e) {
                     int resultIndex = tableIndexResultIndexMap.get(resultDisplayTable.getSelectionIndex());
-                    commandHandler.selectEntry(resultIndex);
+                    searchhandler.selectEntry(resultIndex);
                 }
             });
 
-            resultDisplayTable.addKeyListener(new KeyListener() {
-
-                @Override
-                public void keyReleased(KeyEvent e) {
-                    // TODO Auto-generated method stub
-
-                }
+            resultDisplayTable.addKeyListener(new KeyAdapter() {
 
                 @Override
                 public void keyPressed(KeyEvent e) {
                     if (e.keyCode == SWT.CR) {
                         int resultIndex = tableIndexResultIndexMap.get(resultDisplayTable.getSelectionIndex());
-                        commandHandler.selectEntry(resultIndex);
+                        searchhandler.selectEntry(resultIndex);
                     } else if ((e.keyCode >= 97 && e.keyCode <= 122) || (e.keyCode >= 48 && e.keyCode <= 57)
                             || (e.keyCode >= 16777258 && e.keyCode <= 16777273) || e.keyCode == 32) {
                         // 97-122 Character
                         // 48-57 Digits
                         // 16777258-16777273 Num Locks
                         // 32 Space
-                        searchBoxText.append(Character.toString(e.character));
-                        searchBoxText.setSelection(searchBoxText.getText().length());
-                        searchBoxText.setFocus();
+                        searchboxText.append(Character.toString(e.character));
+                        searchboxText.setSelection(searchboxText.getText().length());
+                        searchboxText.setFocus();
 
                     } else if (e.keyCode == 8) {
                         // 8 Backspace
-                        int length = searchBoxText.getText().length();
+                        int length = searchboxText.getText().length();
                         if (length != 0)
-                            searchBoxText.replaceTextRange(length - 1, 1, "");
-                        searchBoxText.setFocus();
+                            searchboxText.replaceTextRange(length - 1, 1, "");
+                        searchboxText.setFocus();
                     }
                 }
             });
@@ -218,8 +197,7 @@ public class SearchBox {
             tableIndexResultIndexMap = new ArrayList<Integer>();
             for (int i = 0; i < searchResult.size(); i++) {
                 Snippet snippet = searchResult.get(i);
-                ArrayList<String> patternList = snippet.getPatterns();
-                String[] patterns = patternList.toArray(new String[patternList.size()]);
+                String[] patterns = toArray(snippet.getPatterns(), String.class);
 
                 for (int j = 0; j < patterns.length; j++) {
                     TableItem item = new TableItem(resultDisplayTable, SWT.NONE);
@@ -229,7 +207,7 @@ public class SearchBox {
 
             }
 
-            resultDisplayTable.setFont(searchFont);
+            resultDisplayTable.setFont(searchboxFont);
             resultDisplayTable.getColumn(0).pack();
             Point anchor = env.getSearchBoxAnchor();
             resultDisplayShell.setLocation(anchor.x, anchor.y + 35);
